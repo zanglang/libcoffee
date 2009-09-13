@@ -1,15 +1,19 @@
 {% extends 'base.html' %}
 {% load comments %}
+{% load trackback_tags %}
 
 {% block title %}{{ object.title }} - Libcoffee.net{% endblock %}
 
 {% block feed %}
 <link rel="alternate" type="application/rss+xml" title="RSS for this entry's comments" href="/blog/feeds/articles/{{ object.created_at|date:'Y/m/d' }}/{{ object.slug }}/" />
+<link rel="pingback" href="{% get_pingback_url %}" />
 {% endblock %}
 
 {% block body %}
 
 {% include "blog/post_render.html" %}
+
+{% get_trackback_rdf_for object %}
 
 {# older/newer post #}
 {# related posts #} 

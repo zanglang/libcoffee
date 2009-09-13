@@ -24,6 +24,11 @@ class Category(models.Model):
 class Post(models.Model):
 	""" Blog Post """
 	
+	MarkupType = (
+		# add more if needed
+		('r', 'RestructuredText'),
+	)
+	
 	slug = models.SlugField(unique_for_date='created_at')
 	title = models.CharField(max_length=140)
 	author = models.ForeignKey(User)
@@ -32,6 +37,7 @@ class Post(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	published = models.BooleanField()
 	categories = models.ManyToManyField(Category, blank=True)
+	markuptype = models.CharField(max_length=1, choices=MarkupType, blank=True)
 	
 	def __unicode__(self):
 		return u'%s' % self.title
