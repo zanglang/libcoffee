@@ -1,0 +1,22 @@
+from django.conf.urls.defaults import *
+from django.contrib import admin
+from blog import sitemaps
+admin.autodiscover()
+
+urlpatterns = patterns('',
+	
+	# Blog
+	(r'^blog/', include('blog.urls')),
+	(r'^$', 'django.views.generic.simple.redirect_to',
+		{'url': '/blog/', 'permanent': False}),
+
+	(r'^admin/', include(admin.site.urls)),
+	
+	(r'^comments/', include('django.contrib.comments.urls')),
+
+	(r'^media/(?P<path>.*)$', 'django.views.static.serve',
+		{'document_root': '/home/zanglang/djangoblog/blog/media', 'show_indexes': True}),
+		
+	(r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap',
+		{'sitemaps': { 'blog': sitemaps.BlogSitemap }})
+)

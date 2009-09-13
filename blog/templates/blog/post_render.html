@@ -1,0 +1,32 @@
+{% load markup %}
+{% load comments %}
+{% load smart_if %}
+
+{% get_comment_count for object as comment_count %}
+
+<div class="atomentry article">
+	<h2 class="title">
+		<a href="{{ object.get_absolute_url }}">{{ object.title }}</a>
+		{% if comment_count > 0 %}<span class="comment_count">{{ comment_count }}</span>{% endif %}
+	</h2>
+	<p class="author">
+		Posted by <cite>
+			<a href="mailto:{{ object.author.email }}">{{ object.author.first_name }}</a>
+		</cite>
+		<abbr class="published" title="{{ object.updated_at }}">
+			<span class="date">{{ object.updated_at|timesince }} ago</span>
+		</abbr>
+	</p>
+	<div class="content">
+		{{ object.body|restructuredtext }}
+	</div>
+	<ul class="meta">
+    <li class="categories">Posted in {% for category in object.categories.all %}
+    	<a href="{{ category.get_absolute_url }}">{{ category.title }}</a>
+    {% endfor %}</li>
+    <li>Meta
+      <a href="{{ object.get_absolute_url }}#comments">{{ comment_count }} comments</a>,
+      <a href="{{ object.get_absolute_url }}">permalink</a>,
+    </li>
+  </ul>
+</div>

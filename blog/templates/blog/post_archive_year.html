@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Libcoffee.net Blog Archives for {{ year }}{% endblock %}
+
+{% block body %}
+<h2 class="title">Blog Posts in {{ year }}:</h2>
+<ul">
+{% for month in date_list %}
+		<li><a href="/blog/{{ month|date:'Y/m/' }}">{{ month|date:'F Y' }}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}
+
+{# page count #}

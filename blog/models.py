@@ -1,0 +1,56 @@
+from django.db import models
+from django.db.models import permalink
+from django.contrib.auth.models import User
+from django.contrib.syndication.feeds import Feed
+from django.contrib.sitemaps import Sitemap
+
+class Category(models.Model):
+	""" Blog Category """
+	title = models.CharField(max_length=100)
+	slug = models.SlugField(unique=True)
+	
+	class Meta:
+		verbose_name_plural = 'categories'
+		ordering = ('title',)
+	
+	def __unicode__(self):
+		return u'%s' % self.title
+		
+	@permalink
+	def get_absolute_url(self):
+		return ('blog.views.category_detail', (), {'slug': self.slug})
+
+
+class Post(models.Model):
+	""" Blog Post """
+	
+	slug = models.SlugField(unique_for_date='created_at')
+	title = models.CharField(max_length=140)
+	author = models.ForeignKey(User)
+	body = models.TextField()
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
+	published = models.BooleanField()
+	categories = models.ManyToManyField(Category, blank=True)
+	
+	def __unicode__(self):
+		return u'%s' % self.title
+		
+	class Meta:
+		ordering = ('-updated_at',)
+		get_latest_by = 'updated_at'
+		
+	class Admin:
+		list_display = ('title', 'created_at', 'published')
+		list_filter = ('created_at', 'categories', 'published')
+		search_fields = ('title', 'body')
+		
+	@permalink
+	def get_absolute_url(self):
+		return ('post_detail', (), {
+			'slug': self.slug,
+			'year': self.created_at.year,
+			'month': self.created_at.strftime('%m').lower(),
+			'day': self.created_at.day
+		})
+		
