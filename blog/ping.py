@@ -2,7 +2,7 @@ from trackback import signals
 from trackback.utils import handlers
 from django.contrib.sites.models import Site
 from django.contrib.sitemaps import ping_google
-from models import Post
+from blog.models import Post
 import xmlrpclib
 
 signals.send_pingback.connect(handlers.send_pingback, sender = Post)

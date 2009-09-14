@@ -2,7 +2,7 @@ from django.contrib.comments.models import Comment
 from django.contrib.sites.models import Site
 from django.contrib.syndication.feeds import Feed, FeedDoesNotExist
 from django.core.exceptions import ObjectDoesNotExist
-from models import Post
+from blog.models import Post
 
 current_site = Site.objects.get_current()
 
@@ -13,10 +13,10 @@ class LatestPosts(Feed):
 	ttl = '60'
 	
 	def items(self):
-		return Post.objects.filter(published=True).order_by('-updated_at')[:5]
+		return Post.objects.published().order_by('-updated_at')[:10]
 	
 	def item_author_name(self, item):
-		return '%s %s' % (item.author.first_name, item.author.last_name)
+		return item.author.get_full_name()
 	
 	def item_categories(self, item):
 		return item.categories.all()

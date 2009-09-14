@@ -3,6 +3,7 @@ from django.db.models import permalink
 from django.contrib.auth.models import User
 from django.contrib.syndication.feeds import Feed
 from django.contrib.sitemaps import Sitemap
+from blog.managers import PostManager
 
 class Category(models.Model):
 	""" Blog Category """
@@ -38,6 +39,7 @@ class Post(models.Model):
 	published = models.BooleanField()
 	categories = models.ManyToManyField(Category, blank=True)
 	markuptype = models.CharField(max_length=1, choices=MarkupType, blank=True)
+	objects = PostManager()
 	
 	def __unicode__(self):
 		return u'%s' % self.title

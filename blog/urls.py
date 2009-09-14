@@ -1,11 +1,12 @@
 from django.conf.urls.defaults import *
+from django.contrib.comments.feeds import LatestCommentFeed
 from django.contrib.syndication.views import feed
-from feeds import LatestPosts, ArticleFeed
-from models import Post
-import views
+from blog.feeds import LatestPosts, ArticleFeed
+from blog.models import Post
+from blog import views
 
 info_dict = {
-	'queryset': Post.objects.filter(published=True),
+	'queryset': Post.objects.published(),
 	'date_field': 'created_at',
 }
 
@@ -31,6 +32,7 @@ urlpatterns = patterns('django.views.generic.date_based',
 	
 	(r'feeds/(?P<url>.*?)/$', feed, {'feed_dict': {
 		'latest': LatestPosts,
+		'comments': LatestCommentFeed,
 		'articles': ArticleFeed
 	}}),
 )
