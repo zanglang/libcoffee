@@ -1,0 +1,18 @@
+{% load comments %}
+
+<form id="commentform" class="comments" action="{% comment_form_target %}" method="post">
+
+  {% for field in form.visible_fields %}
+    {{ field.errors }}
+      <p {% if field.errors %}class="error"{% endif %}>
+        {{ field.label_tag }}:<br/>{{ field }}
+      </p>
+  {% endfor %}
+  {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+
+  <p class="submit">
+    <input type="submit" name="preview" class="submit-preview" value="Preview" />
+    <input type="submit" name="post" class="submit-post" value="Submit" />
+    <input type="hidden" name="next" value="{{ object.get_absolute_url }}#comments" />
+  </p>
+</form>
