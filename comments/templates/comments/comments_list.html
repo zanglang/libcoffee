@@ -7,17 +7,16 @@
 <div id="comments_div">
 	<ol id="commentList" class="comments">
 {% for comment in comment_list %}
+{% with comment.user_url as url %}
 		<li class="comment">
 		<div class="author">
-			<div>
+			{% if url %}<a href="{{ url }}">{% endif %}
 				{% gravatar_img_for_email comment.user_email 60 %}
-			</div>
+			{% if url %}</a>{% endif %}
 			<cite>
-			{% if comment.user_url %}
-				<a href="{{ comment.user_url }}">{{ comment.user_name }}</a>
-			{% else %}
+			{% if url %}<a class="{{ comment.auth_type }}" href="{{ url }}">{% endif %}
 				{{ comment.user_name }}
-			{% endif %}
+			{% if url %}</a>{% endif %}
 			</cite>
 			<abbr title="{{ comment.submit_date }}">
 				{{ object.created_at|timesince:comment.submit_date }} later:
@@ -27,7 +26,7 @@
 			<p>{{ comment.comment }}</p>
 		</div>
 		</li>
+{% endwith %}
 {% endfor %}
 	</ol>
 </div>
-{% render_comment_form for object %}

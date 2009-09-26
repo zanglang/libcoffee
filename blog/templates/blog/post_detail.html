@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
-{% load trackback_tags %}
+{% load comments trackback_tags %}
 
 {% block title %}{{ object.title }} - Libcoffee.net{% endblock %}
 
 {% block feed %}
-<link rel="alternate" type="application/rss+xml" title="RSS for this entry's comments" href="/blog/feeds/articles/{{ object.created_at|date:'Y/m/d' }}/{{ object.slug }}/" />
+<link rel="alternate" type="application/rss+xml" title="RSS for this entry's comments"
+	href="/blog/feeds/articles/{{ object.created_at|date:'Y/m/d' }}/{{ object.slug }}/" />
 <link rel="pingback" href="{% get_pingback_url %}" />
 {% endblock %}
 
@@ -15,7 +16,7 @@
 {% get_trackback_rdf_for object %}
 
 {# older/newer post #}
-{# related posts #} 
 
 {% include "comments/comments_list.html" %}
+{% render_comment_form for object %}
 {% endblock %}

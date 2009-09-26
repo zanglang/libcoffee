@@ -1,6 +1,9 @@
 from django.conf.urls.defaults import *
 from django.contrib import admin
 from blog import sitemaps
+from auth import views as auth_views
+from django_openid_auth.views import logo as openid_logo
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -20,5 +23,7 @@ urlpatterns = patterns('',
 		{'document_root': '/home/zanglang/djangoblog/media', 'show_indexes': True}),
 		
 	(r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap',
-		{'sitemaps': { 'blog': sitemaps.BlogSitemap }})
+		{'sitemaps': { 'blog': sitemaps.BlogSitemap }}),
+		
+	(r'^auth/', include('auth.urls')),
 )

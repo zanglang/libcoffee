@@ -1,17 +1,36 @@
-{% load comments %}
+{% load comments smart_if %}
 
 <form id="commentform" class="comments" action="{% comment_form_target %}" method="post">
-
-  {% for field in form.visible_fields %}
-    {{ field.errors }}
-      <p {% if field.errors %}class="error"{% endif %}>
-        {{ field.label_tag }}:<br/>{{ field }}
+  {% if user.is_authenticated %}
+    <p><label for="id_comment">Comment:</label><br/>
+    <textarea name="comment" id="id_comment"></textarea></p>
+  {% else %}
+    {% if request.session.user_name != None %}
+      <p>Welcome back, <a href="{{ request.session.user_url }}" class="{{ request.session.user_type }}">
+        {{ request.session.user_name }}</a>!
+        (<a href="/auth/logout?next={{ object.get_absolute_url }}">Logout</a>)
       </p>
+      <p><label for="id_comment">Comment:</label><br/>
+      <textarea name="comment" id="id_comment"></textarea></p>
+      <input type="hidden" name="name" value="{{ request.session.user_name }}"/>
+      <input type="hidden" name="email" value="{{ request.session.user_email }}"/>
+      <input type="hidden" name="url" value="{{ request.session.user_url }}"/>
+      <input type="hidden" name="auth_type" value="{{ request.session.user_type }}"/>
+    {% else %}
+      {% for field in form.visible_fields %}
+      {{ field.errors }}
+        <p {% if field.errors %}class="error"{% endif %}>
+          {{ field.label_tag }}:<br/>{{ field }}
+        </p>
+      {% endfor %}
+    {% endif %}
+  {% endif %}
+  
+  {% for field in form.hidden_fields %}
+    {% if field.name != 'auth_type' %}{{ field }}{% endif %}
   {% endfor %}
-  {% for field in form.hidden_fields %}{{ field }}{% endfor %}
-
+  
   <p class="submit">
-    <input type="submit" name="preview" class="submit-preview" value="Preview" />
     <input type="submit" name="post" class="submit-post" value="Submit" />
     <input type="hidden" name="next" value="{{ object.get_absolute_url }}#comments" />
   </p>
