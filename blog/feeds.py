@@ -24,7 +24,7 @@ class LatestPosts(Feed):
 	def item_pubdate(self, item):
 		return item.created_at
 	
-class ArticleFeed(Feed):
+class PostCommentFeed(Feed):
 	title_template = 'feeds/comment.html'
 	description_template = 'feeds/comment.html'
 	
