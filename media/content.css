@@ -113,52 +113,52 @@
 }
 
 /* Article Entries - class names based on http://microformats.org/wiki/hatom] */
-#content .atomentry { 
+#content .entry { 
 	margin: 0 0 3em 0;
 }
 
-#content .atomentry .title {
+#content .entry .title {
 	font-size: 24px;
 	line-height: 94%;
 	letter-spacing: -1.5px; 
 	margin: 0;
 }
 
-#content .atomentry .title a:link,
-#content .atomentry .title a:visited { 
+#content .entry .title a:link,
+#content .entry .title a:visited { 
 	color: #930;
 	text-decoration: none;
 }
 
-#content .atomentry .title a:hover,
-#content .atomentry .title a:active { 
+#content .entry .title a:hover,
+#content .entry .title a:active { 
 	color: #000;
 	background: transparent;
 }
 
-#content .atomentry .title .comment_count { color: #eee; }
+#content .entry .title .comment_count { color: #eee; }
 
-#content .atomentry .author {
+#content .entry .author {
 	color: #bbb;
 	font: normal 16px/14px "lucidamac bold", "lucida grande", arial, verdana, sans-serif;
 	letter-spacing: -1px;
 	margin: 0 0 1em;
 }
 
-#content .atomentry .author cite a,
-#content .atomentry .author cite a:hover { /* author mailto: link (if any) */
+#content .entry .author cite a,
+#content .entry .author cite a:hover { /* author mailto: link (if any) */
 	color: #aaa; background: transparent;
 	text-decoration: none;
 }
 
-#content .atomentry .author abbr { /* posted date */
+#content .entry .author abbr { /* posted date */
 	font-weight: bold;
 	color: #aaa;
 }
 
-#content .atomentry .content {}
+#content .entry .content {}
 
-#content .atomentry ul.meta { 
+#content .entry ul.meta { 
 	font-size: 10px;
 	background: #eee;
 	margin: 0; padding: 5px;
@@ -166,18 +166,18 @@
 	list-style-type: none;
 }
 
-#content .atomentry ul.meta li { 
+#content .entry ul.meta li { 
 	line-height: 13px;
 	margin: 0; padding: 0;
 }
 
-#content .atomentry .meta a:link,
-#content .atomentry .meta a:visited {
+#content .entry .meta a:link,
+#content .entry .meta a:visited {
 	color: #555;
 }
 
-#content .atomentry .meta a:hover,
-#content .atomentry .meta a:active  {
+#content .entry .meta a:hover,
+#content .entry .meta a:active  {
 	color: #fff;
 }
 
@@ -195,9 +195,9 @@
 	margin: 0 0 1.5em; padding: 1em;
 }
 
-#content .comment.preview { 
+#content .comment.isauthor { 
 	background: #ffc;
-	border: 3px solid #fab444;
+	border: 1px solid #fab444;
 }
 
 #content .comment   .author,

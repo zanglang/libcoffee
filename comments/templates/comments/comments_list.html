@@ -1,4 +1,4 @@
-{% load comments gravatar %}
+{% load comments gravatar smart_if %}
 
 <h5><a name="comments">Comments</a></h5>
 {% get_comment_list for object as comment_list %}
@@ -8,15 +8,14 @@
 	<ol id="commentList" class="comments">
 {% for comment in comment_list %}
 {% with comment.user_url as url %}
-		<li class="comment">
-		<div class="author">
-			{% if url %}<a href="{{ url }}">{% endif %}
-				{% gravatar_img_for_email comment.user_email 60 %}
-			{% if url %}</a>{% endif %}
-			<cite>
-			{% if url %}<a class="{{ comment.auth_type }}" href="{{ url }}">{% endif %}
-				{{ comment.user_name }}
-			{% if url %}</a>{% endif %}
+		<li class="comment {% if comment.user == object.author %}isauthor{% endif %}">
+		<div class="author vcard">
+			<a class="url" {% if url %}href="{{ url }}"{% endif %}>
+				{% gravatar_img_for_email comment.user_email 60 %}</a>
+			<cite class="fn">
+				<a class="fn url {{ comment.auth_type }}" 
+					{% if url %}href="{{ url }}" rel="nofollow"{% endif %}>
+				{{ comment.user_name }}</a>
 			</cite>
 			<abbr title="{{ comment.submit_date }}">
 				{{ object.created_at|timesince:comment.submit_date }} later:
