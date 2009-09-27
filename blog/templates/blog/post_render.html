@@ -2,29 +2,39 @@
 
 {% get_comment_count for object as comment_count %}
 
-<div class="atomentry article">
+<div class="entry hentry">
 	<h2 class="title">
-		<a href="{{ object.get_absolute_url }}">{{ object.title }}</a>
-		{% if comment_count > 0 %}<span class="comment_count">{{ comment_count }}</span>{% endif %}
+		<a class="entry-title bookmark" href="{{ object.get_absolute_url }}">
+			{{ object.title }}
+		</a>
+		{% if comment_count > 0 %}
+			<span class="comment_count">{{ comment_count }}</span>
+		{% endif %}
 	</h2>
-	<p class="author">
-		Posted by <cite>
-			<a href="mailto:{{ object.author.email }}">{{ object.author.first_name }}</a>
+	<p class="vcard author">
+		Posted by
+		<cite class="fn" title="{{ object.author.get_full_name }}">
+			<span class="nickname">{{ object.author.first_name }}</span>
 		</cite>
 		<abbr class="published" title="{{ object.updated_at }}">
-			<span class="date">{{ object.updated_at|timesince }} ago</span>
+			<span class="date">{{ object.updated_at|date:'d/m/y' }}</span>
 		</abbr>
 	</p>
-	<div class="content">
+	<div class="content entry-content">
 		{{ object.body|restructuredtext }}
 	</div>
 	<ul class="meta">
-    <li class="categories">Posted in {% for category in object.categories.all %}
-    	<a href="{{ category.get_absolute_url }}">{{ category.title }}</a>
-    {% endfor %}</li>
-    <li>Meta
-      <a href="{{ object.get_absolute_url }}#comments">{{ comment_count }} comments</a>,
-      <a href="{{ object.get_absolute_url }}">permalink</a>,
-    </li>
-  </ul>
+		<li class="categories">Posted in
+		{% for category in object.categories.all %}
+			<a rel="tag" href="{{ category.get_absolute_url }}">
+				{{ category.title }}</a>
+		{% empty %}
+			Uncategorized
+		{% endfor %} {{ object.updated_at|timesince }} ago
+		</li>
+		<li>Meta
+			<a href="{{ object.get_absolute_url }}#comments">{{ comment_count }} comments</a>,
+			<a rel="bookmark" href="{{ object.get_absolute_url }}">permalink</a>
+		</li>
+	</ul>
 </div>

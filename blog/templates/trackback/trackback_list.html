@@ -1,0 +1,21 @@
+{% load trackbacks %}
+{% get_trackbacks_for object as trackback_list %}
+
+<h5><a name="trackbacks">Trackbacks</a></h5>
+<p>
+    Use the following link to trackback from your own site:<br/>
+    {% get_trackback_url object %}
+</p>
+
+<ol class="trackbacks" id="trackbacks">
+{% for trackback in trackback_list %}
+  <li class="trackback">
+  <div class="author">
+    <a rel="nofollow" href="{{ trackback.url }}">{{ trackback.title }}</a>
+  </div>
+  <div class="content">
+    [...] {{ trackback.excerpt }} [...]
+  </div>
+</li>
+{% endfor %}
+</ol>

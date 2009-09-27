@@ -20,7 +20,7 @@
 	
 	<!-- Page content -->
 	<div id="page">
-	<div id="content">
+	<div id="content" class="hfeed">
 		{% block body %}{% endblock %}
 	</div>
 	{% include "sidebar.html" %}
@@ -29,10 +29,12 @@
 	<!-- Footer -->
 	<div id="footer">
 		<hr/>
-		<p><a href="http://www.libcoffee.net">libcoffee.net</a></p>
+		<p class="copyright">
+		<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">copyleft</a>
+		&copy; 2009. some rights reserved.</p>
 		<ul>
 			<li>
-				Powered by <a href="http://typosphere.org">typo</a> /
+				powered by <a href="http://www.djangoproject.com/">django</a> /
 				styled with <a href="http://quotedprintable.com/pages/scribbish">scribbish</a>
 			</li>
 		</ul>
