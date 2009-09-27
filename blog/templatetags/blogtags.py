@@ -1,5 +1,4 @@
 from django import template
-from django.db import models
 from django.contrib.comments.models import Comment
 from blog.models import Category, Post
 import re

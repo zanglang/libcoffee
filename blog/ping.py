@@ -1,44 +1,82 @@
-from trackback import signals
-from trackback.utils import handlers
+from comments.akismet import Akismet
+from django.conf import settings
 from django.contrib.sites.models import Site
-from django.contrib.sitemaps import ping_google
-from blog.models import Post
+from django.db.models.signals import post_save
+from trackback import signals
+from trackback.models import Trackback
+from trackback.utils.send import send_trackback as send_tb, \
+	send_pingback as send_pb
+import re
+import threading
 import xmlrpclib
 
-signals.send_pingback.connect(handlers.send_pingback, sender = Post)
-signals.send_trackback.connect(handlers.send_trackback, sender = Post)
+URL_RE = re.compile(r'http://[^\ ]+', re.IGNORECASE)
+
+def send_trackback(instance, **kwargs):
+    content = getattr(instance, instance.trackback_content_field_name)
+    urls = URL_RE.findall(content)
+    data = {}
+    site = Site.objects.get_current()
+    data['url'] = site.domain + instance.get_absolute_url()
+    data['title'] = unicode(instance)
+    data['blog_name'] = site.name
+    data['excerpt'] = content[:100]
+    
+    for url in urls:
+        print "trackbacking %s" % url
+        t = threading.Thread(target=send_tb, args=[url, data,])
+        t.start()
+        #send_tb(url, data,) # fail_silently=False)
+        print "pingbacking %s" % url
+        t2 = threading.Thread(target=send_pb, args=[instance.get_absolute_url(), url,])
+        t2.start()
+        #send_pb(instance.get_absolute_url(), url,)# fail_silently=False)
 
 
-def send_trackback(object):
-	signals.send_pingback.send(sender = object.__class__, instance = object)
-	signals.send_trackback.send(sender = object.__class__, instance = object)
-
-
-def send_ping(object):
+def send_ping(instance, **kwargs):
+	print 'sending rpc pings'
 	site = Site.objects.get_current()
 	URLS = (
 		('technorati', 'http://rpc.technorati.com/rpc/ping'),
 		('google', 'http://blogsearch.google.com/ping/RPC2'),
 	)
-	for (site, urls) in URLS:
+	for (name, url) in URLS:
 		try:
 			rpc = xmlrpclib.Server(url);
 			rpc.weblogUpdates.ping(site.name, site.domain)
-		except:
+			print 'pinging %s (%s) successful' % (url, name)
+		except Exception as e:
+			print e
 			pass
 	return
-	
 
-def send_sitemap(sitemap_url=None):
-	URLS = (
-		('google', 'http://www.google.com/webmasters/tools/ping'),
-		('yahoo', 'http://search.yahooapis.com/SiteExplorerService/V1/ping'),
-		('ask', 'http://submissions.ask.com/ping'),
-		('live', 'http://webmaster.live.com/ping.aspx'),
+
+def trackback_check(instance, created, **kwargs):
+	if not created: return # only spam check when creating
+	print 'checking trackback for spam'
+	ak = Akismet(
+		key = settings.TYPEPAD_API_KEY,
+		blog_url = 'http://%s/' % Site.objects.get_current().domain
 	)
-	for (site, url) in URLS:
-		try:
-			ping_google(sitemap_url=sitemap_url, ping_url=url)
-		except:
-			pass # log failure if needed
-	return
+	ak.baseurl = 'api.antispam.typepad.com/1.1/'
+	if ak.verify_key():
+		data = {
+			'user_ip': instance.remote_ip,
+			'user_agent': '',
+			'comment_type': 'trackback',
+			'comment_author': instance.title or instance.blog_name or '',
+			'comment_author_url': instance.url or '',
+		}
+		if not ak.comment_check(instance.excerpt or '', data=data, build_data=True):
+			print 'trackback is ham'
+			instance.is_public = True
+			instance.save() # this will retrigger the signal again, remember to filter it
+		else:
+			print 'marking trackback as spam'
+			instance.is_public = False
+			instance.save()
+
+
+signals.send_trackback.connect(send_trackback, dispatch_uid='send-trackback')
+signals.send_trackback.connect(send_ping, dispatch_uid='send-ping')
+post_save.connect(trackback_check, sender=Trackback, dispatch_uid='trackback-filter')
