@@ -13,6 +13,7 @@ import xmlrpclib
 URL_RE = re.compile(r'http://[^\ ]+', re.IGNORECASE)
 
 def send_trackback(instance, **kwargs):
+    if settings.DEBUG: return # disable when debugging
     content = getattr(instance, instance.trackback_content_field_name)
     urls = URL_RE.findall(content)
     data = {}
@@ -34,6 +35,7 @@ def send_trackback(instance, **kwargs):
 
 
 def send_ping(instance, **kwargs):
+	if settings.DEBUG: return # disable when debugging
 	print 'sending rpc pings'
 	site = Site.objects.get_current()
 	URLS = (

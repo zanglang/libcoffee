@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.sitemaps import Sitemap, ping_google
 from django.db.models.signals import post_save
 from blog.models import Post
@@ -14,6 +15,7 @@ class BlogSitemap(Sitemap):
 
 
 def send_sitemap(sender, sitemap_url=None, **kwargs):
+	if settings.DEBUG: return
 	print 'sending sitemap'
 	URLS = (
 		('google', 'http://www.google.com/webmasters/tools/ping'),
