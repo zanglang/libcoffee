@@ -1,4 +1,6 @@
-{% load markup comments smart_if %}
+{% load markups comments smart_if %}
+
+{% block header %}<link href="/media/pygments.css" media="all" rel="stylesheet" type="text/css" />{% endblock %}
 
 {% get_comment_count for object as comment_count %}
 
@@ -21,7 +23,7 @@
 		</abbr>
 	</p>
 	<div class="content entry-content">
-		{{ object.body|restructuredtext }}
+		{{ object.body|render:object.markuptype }}
 	</div>
 	<ul class="meta">
 		<li class="categories">Posted in
