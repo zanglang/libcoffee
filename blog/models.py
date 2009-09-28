@@ -30,7 +30,9 @@ class Post(models.Model):
 	
 	MarkupType = (
 		# add more if needed
+		('m', 'Markdown'),
 		('r', 'RestructuredText'),
+		('t', 'Textile')
 	)
 	
 	slug = models.SlugField(unique_for_date='created_at')
