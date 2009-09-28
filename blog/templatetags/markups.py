@@ -21,10 +21,6 @@ def generate_pygments_css(path=None):
 	f.close()
 
 
-def do_markup(type):
-	return 
-
-
 @register.filter
 @stringfilter
 def render(content, type='None'):
@@ -61,5 +57,4 @@ def render(content, type='None'):
 				lexer = get_lexer_by_name('text', stripnl=True, encoding='UTF-8')
 		# Just make it plain text.
 		block.replaceWith(highlight(chunk, lexer, formatter))
-
 	return mark_safe(str(soup))

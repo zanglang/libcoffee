@@ -1,8 +1,6 @@
 from django.conf.urls.defaults import *
 from django.contrib import admin
 from blog import sitemaps
-from auth import views as auth_views
-from django_openid_auth.views import logo as openid_logo
 
 admin.autodiscover()
 
