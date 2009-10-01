@@ -32,7 +32,10 @@
 				{{ category.title }}</a>
 		{% empty %}
 			Uncategorized
-		{% endfor %} {{ object.updated_at|timesince }} ago
+		{% endfor %}
+		<abbr class="updated" title="{{ object.updated_at }}">
+			{{ object.updated_at|timesince }} ago
+		</abbr>
 		</li>
 		<li>Meta
 			<a href="{{ object.get_absolute_url }}#comments">{{ comment_count }} comments</a>,
