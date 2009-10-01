@@ -22,5 +22,4 @@ def category_detail(request, slug):
 	return list_detail.object_list(
 		request,
 		queryset = category.post_set.published(),
-		extra_context = {'category': category},
 		template_name = 'blog/post_list.html')

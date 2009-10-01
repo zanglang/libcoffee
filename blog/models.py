@@ -58,11 +58,6 @@ class Post(models.Model):
 		ordering = ('-updated_at',)
 		get_latest_by = 'updated_at'
 		
-	class Admin:
-		list_display = ('title', 'created_at', 'published')
-		list_filter = ('created_at', 'categories', 'published')
-		search_fields = ('title', 'body')
-		
 	def save(self, *args, **kwargs):
 		super(Post, self).save(*args, **kwargs)
 		# newly published
@@ -78,4 +73,3 @@ class Post(models.Model):
 			'month': self.created_at.strftime('%m').lower(),
 			'day': self.created_at.day
 		})
-		
