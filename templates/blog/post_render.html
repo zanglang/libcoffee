@@ -1,4 +1,4 @@
-{% load markups comments smart_if %}
+{% load humanize markups comments smart_if %}
 
 {% block header %}<link href="/media/pygments.css" media="all" rel="stylesheet" type="text/css" />{% endblock %}
 
@@ -18,8 +18,8 @@
 		<cite class="fn" title="{{ object.author.get_full_name }}">
 			<span class="nickname">{{ object.author.first_name }}</span>
 		</cite>
-		<abbr class="published" title="{{ object.updated_at }}">
-			<span class="date">{{ object.updated_at|date:'d/m/y' }}</span>
+		<abbr class="updated" title="{{ object.updated_at }}">
+			<span class="date">{{ object.updated_at|naturalday:'D, N d' }}</span>
 		</abbr>
 	</p>
 	<div class="content entry-content">

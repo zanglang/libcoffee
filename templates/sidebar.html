@@ -6,7 +6,7 @@
 
 {% include 'profile.html' %}
 
-<h3 class="sidebar-title">Categories</h3>
+<h3>Categories</h3>
 <ul id="categories">
 {% get_blog_categories as category_list %}
 {% for category in category_list %}
@@ -14,7 +14,7 @@
 {% endfor %}
 </ul>
 
-<h3 class="sidebar-title">Archives</h3>
+<h3>Archives</h3>
 <ul id="archives">
 {% get_month_list as month_list %}
 {% for blog_month in month_list %}
@@ -22,7 +22,7 @@
 {% endfor %}
 </ul>
 
-<h3 class="sidebar-title">Recent Comments</h3>
+<h3>Recent Comments</h3>
 <ul>
 {% get_latest_comments 5 as latest_comments %}
 {% for comment in latest_comments %}

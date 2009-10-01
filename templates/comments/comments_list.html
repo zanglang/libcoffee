@@ -8,7 +8,7 @@
 	<ol id="commentList" class="comments">
 {% for comment in comment_list %}
 {% with comment.user_url as url %}
-		<li class="comment {% if comment.user == object.author %}isauthor{% endif %}">
+		<li class="comment {% if comment.user.is_staff %}isauthor{% endif %}">
 		<div class="author vcard">
 			<a class="url" {% if url %}href="{{ url }}"{% endif %}>
 				{% gravatar_img_for_email comment.user_email 60 %}</a>
@@ -18,7 +18,7 @@
 				{{ comment.user_name }}</a>
 			</cite>
 			<abbr title="{{ comment.submit_date }}">
-				{{ object.created_at|timesince:comment.submit_date }} later:
+				{{ comment.submit_date|date:'Y-m-d h:sA' }}
 			</abbr>
 		</div>
 		<div class="content">

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load markups comments trackback_tags %}
+
+{% block title %}{{ flatpage.title }} - Libcoffee.net{% endblock %}
+
+{% block feed %}
+<link rel="pingback" href="{% get_pingback_url %}" />
+{% get_trackback_rdf_for flatpage %}
+{% endblock %}
+
+{% block header %}<link href="/media/pygments.css" media="all" rel="stylesheet" type="text/css" />{% endblock %}
+
+{% block body %}
+
+<div class="entry hentry">
+	<h2 class="entry-title">{{ flatpage.title }}</h2>
+	<div class="content entry-content">
+		{{ flatpage.content|render:'t' }}
+	</div>
+</div>
+
+{% if flatpage.enable_comments %}
+{% with flatpage as object %}
+
+{% include "trackback/trackback_list.html" %}
+{% include "comments/comments_list.html" %}
+{% render_comment_form for object %}
+
+{% endwith %}
+{% endif %}
+
+{% endblock %}

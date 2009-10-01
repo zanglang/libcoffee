@@ -7,15 +7,12 @@
 <link rel="alternate" type="application/rss+xml" title="RSS for this entry's comments"
 	href="/blog/feeds/articles/{{ object.created_at|date:'Y/m/d' }}/{{ object.slug }}/" />
 <link rel="pingback" href="{% get_pingback_url %}" />
+{% get_trackback_rdf_for object %}
 {% endblock %}
 
 {% block body %}
 
 {% include "blog/post_render.html" %}
-
-{% get_trackback_rdf_for object %}
-
-{# older/newer post #}
 
 {% include "trackback/trackback_list.html" %}
 {% include "comments/comments_list.html" %}
