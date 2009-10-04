@@ -56,7 +56,8 @@ from docutils import nodes
 from docutils.parsers.rst import directives
 
 from pygments import highlight
-from pygments.lexers import get_lexer_by_name, TextLexer
+from pygments.lexers import get_lexer_by_name
+from pygments.lexers.special import TextLexer
 
 def pygments_directive(name, arguments, options, content, lineno,
                        content_offset, block_text, state, state_machine):

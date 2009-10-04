@@ -40,6 +40,25 @@ from openid.consumer.consumer import SUCCESS, CANCEL, FAILURE
 from openid.consumer.discover import DiscoveryFailure
 from openid.extensions import sreg
 import urllib
+from google.appengine.api import users as GoogleUsers
+
+
+def google_login_begin(request):
+	return HttpResponseRedirect(GoogleUsers.create_login_url(reverse(google_login_complete)))
+
+
+def google_login_complete(request):
+	try:
+		user = GoogleUsers.get_current_user()
+	except:
+		 return render_failure(request, 'Google User details couldn\'t be found.')
+	request.session['user_type'] = 'google'
+	request.session['user_name'] = user.nickname()
+	if '@' not in user.nickname(): # may not have full nick (eg dev server) 
+		request.session['user_url'] = 'http://www.google.com/profiles/%s' % user.nickname() 
+	request.session['user_email'] = user.email()
+	return HttpResponseRedirect('/')
+
 
 def openid_login_begin(request, template_name='openid_login.html',
 				redirect_field_name=REDIRECT_FIELD_NAME):

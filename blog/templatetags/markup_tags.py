@@ -9,6 +9,7 @@ from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name, guess_lexer
 from BeautifulSoup import BeautifulSoup
+import logging
 
 register = template.Library()
 
@@ -23,17 +24,22 @@ def generate_pygments_css(path=None):
 
 @register.filter
 @stringfilter
-def render(content, type='None'):
+def render(content, type=None):
 	"""Render this content for display."""
+	
+	def wrap_plaintext(text):
+		return '<p>' + str(content) + '</p>'
 	
 	try: # this structure feels quite bizarre...
 		markeddown = {
-			'r': restructuredtext,
-			'm': markdown,
-			't': textile
+			'reStructuredText': restructuredtext,
+			'Markdown': markdown,
+			'Textile': textile,
+			None: wrap_plaintext
 		}[type](str(content))
-	except KeyError:
-		markeddown = '<p>' + str(content) + '</p>' # just wrap with paragraph
+	except Exception, e:
+		logging.warn('Error rendering as %s' % (type), exc_info=True)
+		markeddown = wrap_plaintext(content) # just wrap with paragraph
 	
 	# Replace the pulled code blocks with syntax-highlighted versions.
 	soup = BeautifulSoup(markeddown)

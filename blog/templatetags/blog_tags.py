@@ -1,5 +1,5 @@
 from django import template
-from django.contrib.comments.models import Comment
+#from django.contrib.comments.models import Comment
 from blog.models import Category, Post
 import re
 
@@ -9,15 +9,15 @@ class LatestComments(template.Node):
     def __init__(self, limit, var_name):
         self.limit = limit
         self.var_name = var_name
-
+ 
     def render(self, context):
-        comments = Comment.objects.filter(is_public=True)[:int(self.limit)]
-        if comments and (int(self.limit) == 1):
-            context[self.var_name] = comments[0]
-        else:
-            context[self.var_name] = comments
+        #comments = Comment.objects.filter(is_public=True)[:int(self.limit)]
+        #if comments and (int(self.limit) == 1):
+        #    context[self.var_name] = comments[0]
+        #else:
+        #    context[self.var_name] = comments
         return ''
-
+ 
 @register.tag
 def get_latest_comments(parser, token):
     try:
@@ -35,7 +35,7 @@ class BlogCategories(template.Node):
         self.var_name = var_name
 
     def render(self, context):
-        context[self.var_name] = Category.objects.all()
+        context[self.var_name] = Category.all()
         return ''
 
 @register.tag
@@ -55,7 +55,13 @@ class MonthList(template.Node):
         self.var_name = var_name
 
     def render(self, context):
-        context[self.var_name] = Post.objects.dates('created_at', 'month')
+    	from datetime import datetime
+    	dates = []
+    	for p in Post.all():
+    		date = datetime(p.created_at.year, p.created_at.month, 1)
+    		if date not in dates:
+    			dates.append(date)
+        context[self.var_name] = dates#Post.objects.dates('created_at', 'month')
         return ''
        
 @register.tag

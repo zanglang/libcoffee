@@ -1,4 +1,4 @@
-{% load comments smart_if %}
+{% load comment_tags smart_if %}
 
 <form id="commentform" class="comments" action="{% comment_form_target %}" method="post">
   {% if user.is_authenticated %}

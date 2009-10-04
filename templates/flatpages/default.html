@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load markups comments trackback_tags %}
+{% load markup_tags comment_tags trackback_tags %}
 
 {% block title %}{{ flatpage.title }} - Libcoffee.net{% endblock %}
 
@@ -8,14 +8,12 @@
 {% get_trackback_rdf_for flatpage %}
 {% endblock %}
 
-{% block header %}<link href="/media/pygments.css" media="all" rel="stylesheet" type="text/css" />{% endblock %}
-
 {% block body %}
 
 <div class="entry hentry">
 	<h2 class="entry-title">{{ flatpage.title }}</h2>
 	<div class="content entry-content">
-		{{ flatpage.content|render:'t' }}
+		{{ flatpage.content|render:'Textile' }}
 	</div>
 </div>
 

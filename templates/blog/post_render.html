@@ -1,6 +1,4 @@
-{% load humanize markups comments smart_if %}
-
-{% block header %}<link href="/media/pygments.css" media="all" rel="stylesheet" type="text/css" />{% endblock %}
+{% load humanize comment_tags markup_tags smart_if %}
 
 {% get_comment_count for object as comment_count %}
 
@@ -23,11 +21,11 @@
 		</abbr>
 	</p>
 	<div class="content entry-content">
-		{{ object.body|render:object.markuptype }}
+		{{ object.body|render:object.markup }}
 	</div>
 	<ul class="meta">
 		<li class="categories">Posted in
-		{% for category in object.categories.all %}
+		{% for category in object.categories %}
 			<a rel="tag" href="{{ category.get_absolute_url }}">
 				{{ category.title }}</a>
 		{% empty %}

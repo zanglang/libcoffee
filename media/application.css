@@ -3,9 +3,6 @@
  Imports all stylesheets; sets defaults for bare elements
  --------------------------------------------------------------*/
 
-@import 'layout.css';
-@import 'content.css';
-
 @media print { #sidebar { display:none; }
                #content { float: none; width:90%; }
                #content pre { color: #000; background: #eee; }
