@@ -17,6 +17,18 @@
       <input type="hidden" name="url" value="{{ request.session.user_url }}"/>
       <input type="hidden" name="auth_type" value="{{ request.session.user_type }}"/>
     {% else %}
+      <div id="loginform">
+	    <p>Or log in with your preferred identity:<br/>
+           (no registration required)</p>
+        <div>
+          <img class="favicon" src="{{ MEDIA_URL }}global/google.ico" title="Google"/>
+              <a href="/auth/google_login/?next={{ object.get_absolute_url }}">
+              Sign in with Google Account</a><br/>
+          <img class="favicon" src="/auth/openid_logo" title="OpenID" />
+              <a href="/auth/openid_login/?next={{ object.get_absolute_url }}">
+              Sign in with OpenID</a>
+        </div>
+      </div>
       {% for field in form.visible_fields %}
       {{ field.errors }}
         <p {% if field.errors %}class="error"{% endif %}>

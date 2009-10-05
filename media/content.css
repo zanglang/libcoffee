@@ -232,7 +232,30 @@
 #content form.comments {
 	background: #f2f2f2;
 	border-top: 1px solid #ddd;
-	padding: 1em 0.5em;
+	padding: 1em;
+}
+
+#content #loginform {
+	text-align: center;
+	border-left: 1px dashed lightgrey;
+	font-size: 9px;
+	font-family: 'lucida grande',verdana,arial,helvetica,sans-serif;
+	float: right;
+	margin-top: 10px;
+	margin-right: 35px;
+	height: 150px;
+    padding-left: 50px;
+}
+#content #loginform div {
+	font-size: 12px;
+	line-height: 18px;
+	text-align: left;
+}
+#content #loginform.favicon {
+	border: 1px solid lightgrey;
+	vertical-align: middle;
+	margin-right: 5px;
+	height: 14px;
 }
 
 #content form.comments fieldset { 

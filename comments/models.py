@@ -52,13 +52,14 @@ class Comment(BaseCommentAbstractModel):
     # user; otherwise at least user_name should have been set and the comment
     # was posted by a non-authenticated user.
     user = db.ReferenceProperty()
-    user_name = db.StringProperty(verbose_name='user\'s name', multiline=False)
+    user_name = db.StringProperty(verbose_name='user\'s name')
     user_email = db.EmailProperty(default='')
-    user_url = db.StringProperty(verbose_name='user\s URL', multiline=False)
+    user_url = db.StringProperty(verbose_name='user\s URL')
     comment = db.TextProperty(default='')
+    user_type = db.StringProperty() # custom
     
     submit_date = db.DateTimeProperty(verbose_name='date/time submitted')
-    ip_address = db.StringProperty(verbose_name='IP address', multiline=False)
+    ip_address = db.StringProperty(verbose_name='IP address')
     is_public = db.BooleanProperty(default=True)
     is_removed = db.BooleanProperty(default=False)
     
@@ -68,7 +69,6 @@ class Comment(BaseCommentAbstractModel):
     #user_email  = models.EmailField(_("user's email address"), blank=True)
     #user_url    = models.URLField(_("user's URL"), blank=True)
     #comment = models.TextField(_('comment'), max_length=COMMENT_MAX_LENGTH)
-
     # Metadata about the comment
     #submit_date = models.DateTimeField(_('date/time submitted'), default=None)
     #ip_address  = models.IPAddressField(_('IP address'), blank=True, null=True)
@@ -79,7 +79,6 @@ class Comment(BaseCommentAbstractModel):
     #                help_text=_('Check this box if the comment is inappropriate. ' \
     #                            'A "This comment has been removed" message will ' \
     #                            'be displayed instead.'))
-
     # Manager
     #objects = CommentManager()
 

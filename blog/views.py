@@ -5,11 +5,13 @@ from dateutil.relativedelta import relativedelta
 from ragendja.dbutils import get_object_or_404
 
 
+POSTS_PER_PAGE = 10
+
 def post_list(request, page=0):
 	return list_detail.object_list(
 		request,
-		queryset = Post.objects_published(),
-		paginate_by = 10,
+		queryset = Post.objects_published().order('-created_at'),
+		paginate_by = POSTS_PER_PAGE,
 		page = page)
 
 
@@ -18,8 +20,9 @@ def post_archive_year(request, year, page=0):
 	return list_detail.object_list(
 		request,
 		queryset = Post.objects_published().filter('created_at >=', date)
-			.filter('created_at <', date + relativedelta(years=+1)),
-		paginate_by = 10,
+			.filter('created_at <', date + relativedelta(years=+1))
+			.order('-created_at'),
+		paginate_by = POSTS_PER_PAGE,
 		page = page)
 
 
@@ -28,8 +31,9 @@ def post_archive_month(request, year, month, page=0):
 	return list_detail.object_list(
 		request,
 		queryset = Post.objects_published().filter('created_at >=', date)
-				.filter('created_at <', date + relativedelta(months=+1)),
-		paginate_by = 10,
+				.filter('created_at <', date + relativedelta(months=+1))
+				.order('-created_at'),
+		paginate_by = POSTS_PER_PAGE,
 		page = page)
 
 
@@ -38,8 +42,9 @@ def post_archive_day(request, year, month, day, page=0):
 	return list_detail.object_list(
 		request,
 		queryset = Post.objects_published().filter('created_at >=', date)
-				.filter('created_at <', date + relativedelta(days=+1)),
-		paginate_by = 10,
+				.filter('created_at <', date + relativedelta(days=+1))
+				.order('-created_at'),
+		paginate_by = POSTS_PER_PAGE,
 		page = page)
 
 
@@ -48,7 +53,8 @@ def post_detail(request, year, month, day, slug):
 	return list_detail.object_detail(
 		request,
 		queryset = Post.objects_published().filter('created_at >=', date)
-				.filter('created_at <', date + relativedelta(days=+1)),
+				.filter('created_at <', date + relativedelta(days=+1))
+				.order('-created_at'),
 		slug = slug,
 		slug_field = 'slug',
 		template_name = 'blog/post_detail.html')
@@ -65,5 +71,9 @@ def category_detail(request, slug):
 	category = get_object_or_404(Category, 'title =', slug)
 	return list_detail.object_list(
 		request,
-		queryset = Post.all().filter('categories =', category.key()),
+		queryset = Post.objects_published()
+				.filter('categories =', category.key())
+				.order('-created_at'),
+		paginate_by = POSTS_PER_PAGE,
+		page = page,
 		template_name = 'blog/post_list.html')

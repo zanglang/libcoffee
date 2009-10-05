@@ -30,6 +30,7 @@
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, \
 	login as auth_login
+from django.contrib.auth.models import User as DjangoUser
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -39,25 +40,43 @@ from django_openid_auth.views import *
 from openid.consumer.consumer import SUCCESS, CANCEL, FAILURE
 from openid.consumer.discover import DiscoveryFailure
 from openid.extensions import sreg
+import logging
 import urllib
 from google.appengine.api import users as GoogleUsers
+from auth.models import UserMapping
+
 
 
 def google_login_begin(request):
-	return HttpResponseRedirect(GoogleUsers.create_login_url(reverse(google_login_complete)))
-
+	next = '%s?next=%s' % (reverse(google_login_complete), request.GET.get('next', ''))
+	logging.debug('Google login - next is %s' % next)
+	return HttpResponseRedirect(GoogleUsers.create_login_url(next))
 
 def google_login_complete(request):
 	try:
 		user = GoogleUsers.get_current_user()
+		logging.debug('Google login successful for %s' % user.email())
 	except:
-		 return render_failure(request, 'Google User details couldn\'t be found.')
+		 return render_failure(request, 'Google User details couldn\'t be found.')	
+	# check if we have a local user that we may login as well
+	try:
+		mapping = UserMapping.all().filter('google_id =', user.user_id())[0]
+		if request.user.is_anonymous():
+			auth_login(request, mapping.user)
+			logging.debug('mapped user to django user')
+	except:
+		logging.debug('Didn\'t find google user mapping')
+		if request.user.is_authenticated():
+			mapping = UserMapping(user=request.user, google_id=user.user_id())
+			mapping.save()
+	
 	request.session['user_type'] = 'google'
 	request.session['user_name'] = user.nickname()
 	if '@' not in user.nickname(): # may not have full nick (eg dev server) 
 		request.session['user_url'] = 'http://www.google.com/profiles/%s' % user.nickname() 
 	request.session['user_email'] = user.email()
-	return HttpResponseRedirect('/')
+	logging.debug('login complete. redirecting to %s' % request.GET.get('next', ''))
+	return HttpResponseRedirect(request.GET.get('next', ''))
 
 
 def openid_login_begin(request, template_name='openid_login.html',
