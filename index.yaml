@@ -16,21 +16,21 @@ indexes:
   - name: published
   - name: created_at
 
-# Used 66 times in query history.
+# Used 77 times in query history.
 - kind: blog_post
   properties:
   - name: published
   - name: created_at
     direction: desc
 
-# Used 4 times in query history.
+# Unused in query history -- copied from input.
 - kind: blog_post
   properties:
   - name: published
   - name: slug
   - name: created_at
 
-# Used 22 times in query history.
+# Used 15 times in query history.
 - kind: blog_post
   properties:
   - name: published
@@ -38,7 +38,7 @@ indexes:
   - name: created_at
     direction: desc
 
-# Used once in query history.
+# Unused in query history -- copied from input.
 - kind: blog_post
   properties:
   - name: published
@@ -58,7 +58,7 @@ indexes:
   - name: action_time
     direction: desc
 
-# Used once in query history.
+# Unused in query history -- copied from input.
 - kind: django_comments
   properties:
   - name: content_object
@@ -67,7 +67,7 @@ indexes:
   - name: submit_date
     direction: desc
 
-# Used once in query history.
+# Unused in query history -- copied from input.
 - kind: django_comments
   properties:
   - name: is_public

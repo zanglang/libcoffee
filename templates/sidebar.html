@@ -1,4 +1,5 @@
-{% load blog_tags %}
+{% load cache blog_tags %}
+{% cache 3600 sidebar %}
 
 <!-- Navigation sidebar -->
 <div id="sidebar">
@@ -34,3 +35,5 @@
 
 {% endblock %}
 </div>
+
+{% endcache %}

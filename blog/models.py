@@ -1,18 +1,15 @@
-from django.db import models
-from google.appengine.ext import db
-from django.db.models import permalink, signals
 from django.contrib.auth.models import User
-from trackback.signals import send_trackback
-#from blog.managers import PostManager
-import blog.ping
-from ragendja.dbutils import cleanup_relations, KeyListProperty
+from django.db import models
+from django.db.models import permalink, signals
+from datetime import datetime
 import logging
+from google.appengine.ext import db
+from ragendja.dbutils import cleanup_relations, KeyListProperty
 
 
 class Category(db.Model):
 	""" Blog Category """
 	title = db.CategoryProperty(required=True)
-	#slug = models.SlugField(unique=True)
 	
 	class Meta:
 		verbose_name_plural = 'categories'
@@ -43,11 +40,8 @@ class Post(db.Model):
 	created_at = db.DateTimeProperty(auto_now_add=True)
 	updated_at = db.DateTimeProperty(auto_now=True)
 	published = db.BooleanProperty(default=False)
-	#categories = models.ManyToManyField(Category, blank=True)
 	categories = KeyListProperty(Category)
-	#markuptype = models.CharField(max_length=1, choices=MarkupType, blank=True)
 	markup = db.StringProperty(choices=MarkupType)
-	#objects = PostManager()
 	trackback_content_field_name = 'body'
 	
 	def __init__(self, *args, **kw):
@@ -64,11 +58,9 @@ class Post(db.Model):
 	def save(self, *args, **kwargs):
 		if not self.slug:
 			self.slug = title.replace(' ', '').lower()
+		if not self.created_at: # not sure why it's empty
+			self.created_at = datetime.now()
 		super(Post, self).save(*args, **kwargs)
-		# newly published
-		#if (not self._was_published and self.published):
-		logging.debug('sending signals')
-		send_trackback.send(sender=self.__class__, instance=self)
 		
 	@permalink
 	def get_absolute_url(self):

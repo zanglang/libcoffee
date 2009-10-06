@@ -1,5 +1,6 @@
 from django.contrib import admin
 from blog.models import *
+from google.appengine.ext import db
 
 
 class PostAdmin(admin.ModelAdmin):
@@ -9,6 +10,12 @@ class PostAdmin(admin.ModelAdmin):
 	date_hierarchy = 'updated_at'
 	prepopulated_fields = {"slug": ("title",)}
 	#radio_fields = {'markup': admin.VERTICAL}
+	actions = ['publish']
+	
+	def publish(self, request, queryset):
+		for p in queryset:
+			p.published = True
+		db.put(queryset)
 
 
 admin.site.register(Category)

@@ -1,4 +1,5 @@
-{% load humanize comment_tags markup_tags smart_if %}
+{% load cache humanize comment_tags markup_tags smart_if %}
+{% cache 6000 postcache object %}
 
 {% get_comment_count for object as comment_count %}
 
@@ -41,3 +42,5 @@
 		</li>
 	</ul>
 </div>
+
+{% endcache %}

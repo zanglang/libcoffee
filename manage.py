@@ -1,4 +1,5 @@
 #!/usr/bin/python2.5
+
 if __name__ == '__main__':
     from common.appenginepatch.aecmd import setup_env
     setup_env(manage_py_env=True)
@@ -6,7 +7,7 @@ if __name__ == '__main__':
     # Recompile translation files
     from mediautils.compilemessages import updatemessages
     updatemessages()
-
+    
     # Generate compressed media files for manage.py update
     import sys
     from mediautils.generatemedia import updatemedia
