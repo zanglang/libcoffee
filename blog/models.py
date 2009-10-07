@@ -52,7 +52,7 @@ class Post(db.Model):
 		return u'%s' % self.title
 		
 	class Meta:
-		ordering = ('-updated_at',)
+		ordering = ('-created_at',)
 		#get_latest_by = 'updated_at'
 		
 	def save(self, *args, **kwargs):

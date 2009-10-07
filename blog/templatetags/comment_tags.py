@@ -71,8 +71,8 @@ class BaseCommentNode(template.Node):
             return self.comment_model.all().filter('False =', True)
 
         qs = self.comment_model.all() \
-            .filter('content_object =', object) \
-			.filter('site =', Site.objects.get_current())
+            .filter('content_object =', object)
+			#.filter('site =', Site.objects.get_current())
 			#content_type = ctype,
             #object_pk    = smart_unicode(object_pk),
             #site__pk     = settings.SITE_ID,

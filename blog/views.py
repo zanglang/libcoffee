@@ -70,7 +70,7 @@ def category_list(request):
 		template_name = 'blog/category_list.html')
  
  
-def category_detail(request, slug):
+def category_detail(request, slug, page=0):
 	category = get_object_or_404(Category, 'title =', slug)
 	return list_detail.object_list(
 		request,

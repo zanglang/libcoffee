@@ -1,4 +1,4 @@
-{% load cache humanize comment_tags markup_tags smart_if %}
+{% load cache humanize blog_tags comment_tags markup_tags smart_if %}
 {% cache 6000 postcache object %}
 
 {% get_comment_count for object as comment_count %}
@@ -17,8 +17,8 @@
 		<cite class="fn" title="{{ object.author.get_full_name }}">
 			<span class="nickname">{{ object.author.first_name }}</span>
 		</cite>
-		<abbr class="updated" title="{{ object.updated_at }}">
-			<span class="date">{{ object.updated_at|naturalday:'D, N d' }}</span>
+		<abbr class="published" title="{{ object.created_at }}">
+			<span class="date">{{ object.created_at|naturalday:'D, N d' }}</span>
 		</abbr>
 	</p>
 	<div class="content entry-content">
@@ -26,14 +26,15 @@
 	</div>
 	<ul class="meta">
 		<li class="categories">Posted in
-		{% for category in object.categories %}
+		{% get_categories_for object as category_list %}
+		{% for category in category_list %}
 			<a rel="tag" href="{{ category.get_absolute_url }}">
 				{{ category.title }}</a>
 		{% empty %}
 			Uncategorized
 		{% endfor %}
-		<abbr class="updated" title="{{ object.updated_at }}">
-			{{ object.updated_at|timesince }} ago
+		<abbr class="published" title="{{ object.updated_at }}">
+			{{ object.created_at|timesince }} ago
 		</abbr>
 		</li>
 		<li>Meta

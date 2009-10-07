@@ -28,7 +28,7 @@ def render(content, type=None):
 	"""Render this content for display."""
 	
 	def wrap_plaintext(text):
-		return '<p>' + str(content) + '</p>'
+		return '<p>' + unicode(content) + '</p>'
 	
 	try: # this structure feels quite bizarre...
 		markeddown = {
@@ -36,7 +36,7 @@ def render(content, type=None):
 			'Markdown': markdown,
 			'Textile': textile,
 			None: wrap_plaintext
-		}[type](str(content))
+		}[type](unicode(content))
 	except Exception, e:
 		logging.warn('Error rendering as %s' % (type), exc_info=True)
 		markeddown = wrap_plaintext(content) # just wrap with paragraph

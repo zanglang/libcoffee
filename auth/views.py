@@ -74,7 +74,7 @@ def google_login_complete(request):
 	request.session['user_name'] = user.nickname()
 	if '@' not in user.nickname(): # may not have full nick (eg dev server) 
 		request.session['user_url'] = 'http://www.google.com/profiles/%s' % user.nickname() 
-	request.session['user_email'] = user.email()
+	request.session['user_email'] = user.email() or (user.nickname() + '@gmail.com')
 	logging.debug('login complete. redirecting to %s' % request.GET.get('next', ''))
 	return HttpResponseRedirect(request.GET.get('next', ''))
 

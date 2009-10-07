@@ -1,4 +1,4 @@
-{% load cache comment_tags gravatar smart_if %}
+{% load cache comment_tags markup_tags gravatar smart_if %}
 {% cache 600 comments object %}
 
 <h5><a name="comments">Comments</a></h5>
@@ -23,7 +23,7 @@
 			</abbr>
 		</div>
 		<div class="content">
-			<p>{{ comment.comment }}</p>
+			<p>{{ comment.comment|render:'Markdown' }}</p>
 		</div>
 		</li>
 {% endfor %}
