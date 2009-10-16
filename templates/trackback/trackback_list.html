@@ -1,4 +1,6 @@
-{% load trackback_tags %}
+{% load cache trackback_tags %}
+{% cache 1000000 trackbacks object.pk %}
+
 {% get_trackbacks_for object as trackback_list %}
 
 <h5><a name="trackbacks">Trackbacks</a></h5>
@@ -21,3 +23,5 @@
 </li>
 {% endfor %}
 </ol>
+
+{% endcache %}

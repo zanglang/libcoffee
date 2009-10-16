@@ -3,6 +3,14 @@ from django.contrib.syndication.feeds import Feed
 from django.contrib.sites.models import Site
 from django.utils.translation import ugettext as _
 from comments.models import Comment
+from memoize import memoize
+
+@memoize()
+def get_comments():
+	return Comment.objects_public() \
+        	.order('-submit_date').fetch(40)
+        	#.filter('site =', Site.objects.get_current())
+
 
 class LatestCommentFeed(Feed):
     """Feed of latest comments on the current site."""
@@ -23,9 +31,7 @@ class LatestCommentFeed(Feed):
         return _("Latest comments on %(site_name)s") % dict(site_name=self._site.name)
 
     def items(self):
-        return Comment.objects_public() \
-        		.filter('site =', Site.objects.get_current()) \
-        		.order('-submit_date').fetch(40)
+        return get_comments() 
         
     def item_pubdate(self, item):
         return item.submit_date

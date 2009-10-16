@@ -13,6 +13,7 @@ from django.views.decorators.http import require_POST
 from google.appengine.api import users
 from google.appengine.ext import db
 from ragendja.dbutils import get_object_or_404
+import logging
 import urllib
 import textwrap
 import comments
@@ -183,6 +184,9 @@ comment_done = confirmation_view(
 )
 
 def comment_view(request, id):
-	comment = db.get(id)
-	return HttpResponseRedirect(comment.content_object.get_absolute_url() + \
-			('#c%s' % comment.key().id()))
+	if id.startswith('id'):	# because we messed up our keys...
+		comment = comments.get_model().get_by_key_name(id)
+	else:
+		comment = comments.get_model().get_by_id(long(id))
+	link = '%s#c%s' % (comment.content_object.get_absolute_url(), id)
+	return HttpResponseRedirect(link)

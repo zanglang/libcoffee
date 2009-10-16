@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load markup_tags comment_tags trackback_tags %}
+{% load cache markup_tags comment_tags trackback_tags %}
 
 {% block title %}{{ flatpage.title }} - Libcoffee.net{% endblock %}
 
@@ -9,13 +9,14 @@
 {% endblock %}
 
 {% block body %}
-
+{% cache 1000000 flatpage flatpage.pk %}
 <div class="entry hentry">
 	<h2 class="entry-title">{{ flatpage.title }}</h2>
 	<div class="content entry-content">
 		{{ flatpage.content|render:'Textile' }}
 	</div>
 </div>
+{% endcache %}
 
 {% if flatpage.enable_comments %}
 {% with flatpage as object %}
@@ -26,5 +27,4 @@
 
 {% endwith %}
 {% endif %}
-
 {% endblock %}

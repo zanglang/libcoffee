@@ -6,7 +6,7 @@ from django.core import urlresolvers
 from django.db.models import permalink
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-from google.appengine.api import users
+from google.appengine.api import memcache, users
 from google.appengine.ext import db
 import logging
 
@@ -54,7 +54,7 @@ class Comment(BaseCommentAbstractModel):
     user = db.ReferenceProperty()
     user_name = db.StringProperty(verbose_name='user\'s name')
     user_email = db.EmailProperty(default='')
-    user_url = db.StringProperty(verbose_name='user\s URL')
+    user_url = db.StringProperty(verbose_name='user\'s URL')
     comment = db.TextProperty(default='')
     user_type = db.StringProperty() # custom
     
@@ -62,25 +62,11 @@ class Comment(BaseCommentAbstractModel):
     ip_address = db.StringProperty(verbose_name='IP address')
     is_public = db.BooleanProperty(default=True)
     is_removed = db.BooleanProperty(default=False)
-    
-    #user = models.ForeignKey(User, verbose_name=_('user'),
-    #                blank=True, null=True, related_name="%(class)s_comments")
-    #user_name   = models.CharField(_("user's name"), max_length=50, blank=True)
-    #user_email  = models.EmailField(_("user's email address"), blank=True)
-    #user_url    = models.URLField(_("user's URL"), blank=True)
-    #comment = models.TextField(_('comment'), max_length=COMMENT_MAX_LENGTH)
-    # Metadata about the comment
-    #submit_date = models.DateTimeField(_('date/time submitted'), default=None)
-    #ip_address  = models.IPAddressField(_('IP address'), blank=True, null=True)
-    #is_public   = models.BooleanField(_('is public'), default=True,
-    #                help_text=_('Uncheck this box to make the comment effectively ' \
-    #                            'disappear from the site.'))
-    #is_removed  = models.BooleanField(_('is removed'), default=False,
-    #                help_text=_('Check this box if the comment is inappropriate. ' \
-    #                            'A "This comment has been removed" message will ' \
-    #                            'be displayed instead.'))
-    # Manager
-    #objects = CommentManager()
+
+    def __init__(self, *args, **kw):
+        super(Comment, self).__init__(*args, **kw)
+        self.facebook_uid = self.user_type == 'facebook' and \
+        		self.user_email.split('@')[0] or None
 
     class Meta:
         db_table = "django_comments"
@@ -96,9 +82,14 @@ class Comment(BaseCommentAbstractModel):
         if self.submit_date is None:
             self.submit_date = datetime.datetime.now()
         super(Comment, self).save()
+        memcache.flush_all()
+        
+    def delete(self):
+        super(Comment, self).delete()
+        memcache.flush_all()
         
     def _get_short_id(self):
-    	return self.key().id()
+    	return self.key().id_or_name() # remind self to use this less.
     shortid = property(_get_short_id)
 
     def _get_userinfo(self):
@@ -154,8 +145,8 @@ class Comment(BaseCommentAbstractModel):
     url = property(_get_url, _set_url, doc="The URL given by the user who posted this comment")
 
     @permalink
-    def get_absolute_url(self, anchor_pattern="#c%s"):
-        return ('comments-url-redirect', (), { 'id': self.pk})
+    def get_absolute_url(self):
+    	return ('comments-url-redirect', (), { 'id': self.shortid })
 
     def get_as_text(self):
         """

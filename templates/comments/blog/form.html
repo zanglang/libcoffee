@@ -1,4 +1,5 @@
 {% load comment_tags smart_if %}
+<script type="text/javascript">function facebook_onlogin(){ window.location = "{% url auth.views.facebook_login_complete %}?next={{ object.get_absolute_url }}" }</script>
 
 <form id="commentform" class="comments" action="{% comment_form_target %}" method="post">
   {% if user.is_authenticated %}
@@ -7,26 +8,29 @@
   {% else %}
     {% if request.session.user_name != None %}
       <p>Welcome back, <a href="{{ request.session.user_url }}" class="{{ request.session.user_type }}">
-        {{ request.session.user_name }}</a>!
-        (<a href="/auth/logout?next={{ object.get_absolute_url }}">Logout</a>)
+      	{{ request.session.user_name }}</a>!
+      	(<a href="/auth/logout?next={{ object.get_absolute_url }}">Logout</a>)
       </p>
       <p><label for="id_comment">Comment:</label><br/>
       <textarea name="comment" id="id_comment"></textarea></p>
       <input type="hidden" name="name" value="{{ request.session.user_name }}"/>
       <input type="hidden" name="email" value="{{ request.session.user_email }}"/>
       <input type="hidden" name="url" value="{{ request.session.user_url }}"/>
-      <input type="hidden" name="auth_type" value="{{ request.session.user_type }}"/>
+      <input type="hidden" name="user_type" value="{{ request.session.user_type }}"/>
     {% else %}
       <div id="loginform">
 	    <p>Or log in with your preferred identity:<br/>
            (no registration required)</p>
         <div>
-          <img class="favicon" src="{{ MEDIA_URL }}global/google.ico" title="Google"/>
+          <img class="favicon" title="Google"
+              src="{{ MEDIA_URL }}global/google.ico"/>
               <a href="/auth/google_login/?next={{ object.get_absolute_url }}">
               Sign in with Google Account</a><br/>
-          <img class="favicon" src="/auth/openid_logo" title="OpenID" />
+          <img class="favicon" title="OpenID" src="/auth/openid_logo" />
               <a href="/auth/openid_login/?next={{ object.get_absolute_url }}">
               Sign in with OpenID</a>
+          <br/><br/>
+          <fb:login-button onlogin="facebook_onlogin();"></fb:login-button>
         </div>
       </div>
       {% for field in form.visible_fields %}

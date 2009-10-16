@@ -1,19 +1,20 @@
 # From: http://code.google.com/p/django-gravatar/
 
 from django import template
+from django.core.cache import cache as memcache
 from django.utils.html import escape
 from django.utils.hashcompat import md5_constructor
-from google.appengine.api import memcache
 
 register = template.Library()
 
+
 @register.simple_tag
 def gravatar_for_email(email, size=80):
-	data = memcache.get(email, namespace='gravatar')
-	if data is None:
-		data = md5_constructor(email).hexdigest()
-		memcache.add(email, data, namespace='gravatar')
-	return "http://www.gravatar.com/avatar/%s?s=%d&d=identicon" % (data, size)
+	hash = memcache.get('gravatar' + email)
+	if not hash:
+		hash = md5_constructor(email).hexdigest()
+		memcache.set('gravatar' + email, hash)
+	return "http://www.gravatar.com/avatar/%s?s=%d&d=identicon" % (hash, size)
 
 @register.simple_tag
 def gravatar_img_for_email(email, size=80):

@@ -1,25 +1,18 @@
-from comments.akismet import Akismet
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import get_resolver, NoReverseMatch, Resolver404
-from django.db.models.signals import post_save
-from trackback import registry, signals
-from trackback.models import Trackback
-from trackback.utils.send import send_trackback as send_tb, \
-	send_pingback as send_pb
-from google.appengine.ext import db
-import logging
-import re
-import threading
-import xmlrpclib
+from django.core.urlresolvers import reverse
+from blog.models import Post
+from blog.tasks import send_trackback as send_trackback_task
+from trackback import registry
+from google.appengine.ext.deferred import deferred
+import logging, re, urllib, xmlrpclib
 
-URL_RE = re.compile(r'http://[^\ ]+', re.IGNORECASE)
-
+URL_RE = re.compile(r'\b((https?|ftp|file)://[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])', re.IGNORECASE)
 
 def resolver(target_url):
-	from blog.models import Post
+	from django.core.urlresolvers import get_resolver, NoReverseMatch, Resolver404
+	from datetime import datetime
+	from dateutil.relativedelta import relativedelta
 	try:
 		urlresolver = get_resolver(None)
 		site = Site.objects.get_current()
@@ -35,49 +28,81 @@ def resolver(target_url):
 		return None
 registry.add(resolver, True)
 
+
 def send_trackback(instance, **kwargs):
-    #if settings.DEBUG: return # disable when debugging
-    content = getattr(instance, instance.trackback_content_field_name)
-    urls = URL_RE.findall(content)
-    data = {}
-    site = Site.objects.get_current()
-    data['url'] = site.domain + instance.get_absolute_url()
-    data['title'] = unicode(instance)
-    data['blog_name'] = site.name
-    data['excerpt'] = content[:100]
-    
-    for url in urls:
-        logging.debug("trackbacking %s" % url)
-        t = threading.Thread(target=send_tb, args=[url, data,])
-        t.start()
-        #send_tb(url, data,) # fail_silently=False)
-        logging.debug("pingbacking %s" % url)
-        t2 = threading.Thread(target=send_pb, args=[instance.get_absolute_url(), url,])
-        t2.start()
-        #send_pb(instance.get_absolute_url(), url,)# fail_silently=False)
+	from trackback.utils.parse import discover_pingback_url, discover_trackback_url
+	from google.appengine.api.labs import taskqueue
+	import copy
+	
+	#if settings.DEBUG: return # disable when debugging
+	if not settings.DEBUG and type(instance) is Post \
+		and (not instance.published or instance._was_published):
+			return
+	content = getattr(instance, instance.trackback_content_field_name, '')
+	site = Site.objects.get_current()
+	urls = URL_RE.findall(content)
+	data = {}
+	data['url'] = 'http://%s%s' % (site.domain, instance.get_absolute_url())
+	data['title'] = unicode(instance)
+	data['blog_name'] = site.name
+	data['excerpt'] = content[:200]
+	payload = urllib.urlencode(data)
+	#send_trackback_url = reverse(send_trackback_task)
+	
+	countdown = 0
+	for url, _ in urls:
+		try:
+			target = discover_trackback_url(url)
+			if target:
+				ctype = 'trackback'
+			else:
+				target = discover_pingback_url(url)
+				if not target:
+					logging.debug('No trackback/pingback service found for %s' % url)
+					continue
+				ctype = 'pingback'
+			countdown += 5
+			deferred.defer(send_trackback_task, ctype, data['url'], target,
+						payload, _countdown=countdown)
+			#		'type': type,
+			#		'target': target,
+			#		'source': data['url'],
+			#		'data': payload })
+			
+		except:
+			logging.error('send_trackback error', exc_info=True)
 
 
 def send_ping(instance, **kwargs):
-	if settings.DEBUG: return # disable when debugging
+	#if settings.DEBUG: return # disable when debugging
+	if type(instance) is Post:
+		if not instance.published or instance._was_published:
+			return
 	logging.debug('sending rpc pings')
-	#site = Site.objects.get_current()
-	site = 'localhost:8000'
+	site = Site.objects.get_current()
 	URLS = (
 		('technorati', 'http://rpc.technorati.com/rpc/ping'),
 		('google', 'http://blogsearch.google.com/ping/RPC2'),
+		('feedburner', 'http://ping.feedburner.com'),
 	)
 	for (name, url) in URLS:
 		try:
 			rpc = xmlrpclib.Server(url);
-			rpc.weblogUpdates.ping(site, site)
-			logging.info('pinging %s (%s) successful' % (url, name))
+			result = rpc.weblogUpdates.ping(site.name, 'http://%s' % site.domain,
+					'http://%s%s' % (site.domain, instance.get_absolute_url()))
+			if result['flerror']:
+				logging.warn('Error pinging %s (%s). Reason: %s' % 
+							(url, name, result['message']))
+			else:
+				logging.info('pinging %s (%s) successful' % (url, name))
 		except Exception:
-			logging.warn('Error pinging %s (%s)' % (url, name), exc_info=True)
+			logging.debug('Error sending XMLRPC', exc_info=True)
 	return
 
 
 def trackback_check(instance, created, **kwargs):
-	if not created: return # only spam check when creating
+	from comments.akismet import Akismet	
+	if not created: return
 	logging.debug('checking trackback for spam')
 	ak = Akismet(
 		key = settings.TYPEPAD_API_KEY,
@@ -95,13 +120,7 @@ def trackback_check(instance, created, **kwargs):
 		if not ak.comment_check(instance.excerpt or '', data=data, build_data=True):
 			logging.debug('trackback is ham')
 			instance.is_public = True
-			instance.save() # this will retrigger the signal again, remember to filter it
 		else:
 			logging.warn('marking trackback as spam')
 			instance.is_public = False
-			instance.save()
-
-
-signals.send_trackback.connect(send_trackback, dispatch_uid='send-trackback')
-signals.send_trackback.connect(send_ping, dispatch_uid='send-ping')
-post_save.connect(trackback_check, sender=Trackback, dispatch_uid='trackback-filter')
+		instance.save()

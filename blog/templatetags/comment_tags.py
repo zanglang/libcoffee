@@ -7,8 +7,6 @@ from django.core import urlresolvers
 from comments.models import Comment
 from comments.forms import CommentForm
 from django.utils.encoding import smart_unicode
-from google.appengine.ext import db
-import logging
 
 register = template.Library()
 
@@ -68,7 +66,7 @@ class BaseCommentNode(template.Node):
         object, object_pk = self.get_target_object_pk(context)
         if not object_pk:
             #return self.comment_model.objects.none()
-            return self.comment_model.all().filter('False =', True)
+            return self.comment_model.all().filter('False =', True) # facepalm
 
         qs = self.comment_model.all() \
             .filter('content_object =', object)

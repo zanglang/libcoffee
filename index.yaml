@@ -10,27 +10,30 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-# Unused in query history -- copied from input.
+- kind: blog_post
+  properties:
+  - name: categories
+  - name: published
+  - name: created_at
+    direction: desc
+
 - kind: blog_post
   properties:
   - name: published
   - name: created_at
 
-# Used 77 times in query history.
 - kind: blog_post
   properties:
   - name: published
   - name: created_at
     direction: desc
 
-# Unused in query history -- copied from input.
 - kind: blog_post
   properties:
   - name: published
   - name: slug
   - name: created_at
 
-# Used 15 times in query history.
 - kind: blog_post
   properties:
   - name: published
@@ -38,27 +41,23 @@ indexes:
   - name: created_at
     direction: desc
 
-# Unused in query history -- copied from input.
 - kind: blog_post
   properties:
   - name: published
   - name: updated_at
     direction: desc
 
-# Unused in query history -- copied from input.
 - kind: blog_post
   properties:
   - name: slug
   - name: created_at
 
-# Used 4 times in query history.
 - kind: django_admin_log
   properties:
   - name: user
   - name: action_time
     direction: desc
 
-# Unused in query history -- copied from input.
 - kind: django_comments
   properties:
   - name: content_object
@@ -67,11 +66,17 @@ indexes:
   - name: submit_date
     direction: desc
 
-# Unused in query history -- copied from input.
 - kind: django_comments
   properties:
   - name: is_public
   - name: is_removed
   - name: site
+  - name: submit_date
+    direction: desc
+
+- kind: django_comments
+  properties:
+  - name: is_public
+  - name: is_removed
   - name: submit_date
     direction: desc

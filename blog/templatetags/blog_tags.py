@@ -1,8 +1,10 @@
 from django import template
-from comments.models import Comment
+from django.core.cache import cache as memcache
 from blog.models import Category, Post
-from google.appengine.api import memcache
-from google.appengine.ext import db
+from comments.models import Comment
+from keycache import serialize_models, deserialize_models
+
+from datetime import datetime
 import re
 
 register = template.Library()
@@ -14,8 +16,11 @@ class LatestComments(template.Node):
 		self.var_name = var_name
  
 	def render(self, context):
-		comments = Comment.objects_public() \
-			.order('-submit_date')[:int(self.limit)]
+		comments = deserialize_models(memcache.get('blog-latest-comments'))
+		if comments is None:
+			comments = Comment.objects_public() \
+					.order('-submit_date')[:int(self.limit)]
+			memcache.add('blog-latest-comments', serialize_models(comments))
 		if comments and (int(self.limit) == 1):
 			context[self.var_name] = comments[0]
 		else:
@@ -40,8 +45,13 @@ class BlogCategories(template.Node):
 		self.var_name = var_name
 
 	def render(self, context):
-		context[self.var_name] = Category.all().order('title')
+		categories = deserialize_models(memcache.get('blog-categories'))
+		if categories is None:
+			categories = Category.all().order('title')
+			memcache.add('blog-categories', serialize_models(categories))
+		context[self.var_name] = categories
 		return ''
+
 
 @register.tag
 def get_blog_categories(parser, token):
@@ -63,7 +73,11 @@ class CategoriesFor(template.Node):
 	
 	def render(self, context):
 		self.object = template.resolve_variable(self.obj_name, context)
-		context[self.varname] = db.get(self.object.categories)
+		categories = deserialize_models(memcache.get('categories-for-' + self.object.pk))
+		if not categories:
+			categories = Category.get(self.object.categories)
+			memcache.set('categories-for-' + self.object.pk, serialize_models(categories))
+		context[self.varname] = categories
 		return ''
 
 @register.tag
@@ -79,17 +93,17 @@ def get_categories_for(parser, token):
 class MonthList(template.Node):
 	def __init__(self, var_name):
 		self.var_name = var_name
-
+		
 	def render(self, context):
-		dates = memcache.get('blog-months')
+		posts = Post.objects_published().order('-created_at')
+		dates = memcache.get('months-list')
 		if dates is None:
-			from datetime import datetime
 			dates = []
-			for p in Post.all().order('-created_at').fetch(1000):
+			for p in posts:
 				date = datetime(p.created_at.year, p.created_at.month, 1)
-				if date not in dates:
+				if not date in dates:
 					dates.append(date)
-			memcache.add('blog-months', dates, 60*60*12)
+			memcache.set('months-list', dates)
 		context[self.var_name] = dates
 		return ''
 

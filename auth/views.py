@@ -57,7 +57,7 @@ def google_login_complete(request):
 		user = GoogleUsers.get_current_user()
 		logging.debug('Google login successful for %s' % user.email())
 	except:
-		 return render_failure(request, 'Google User details couldn\'t be found.')	
+		 return render_failure(request, 'Google User details couldn\'t be found.')
 	# check if we have a local user that we may login as well
 	try:
 		mapping = UserMapping.all().filter('google_id =', user.user_id())[0]
@@ -79,7 +79,7 @@ def google_login_complete(request):
 	return HttpResponseRedirect(request.GET.get('next', ''))
 
 
-def openid_login_begin(request, template_name='openid_login.html',
+def openid_login_begin(request, template_name='auth/openid_login.html',
 				redirect_field_name=REDIRECT_FIELD_NAME):
 	"""Begin an OpenID login request, possibly asking for an identity URL."""
 	redirect_to = request.REQUEST.get(redirect_field_name, reverse(openid_login_begin))
@@ -173,3 +173,38 @@ def openid_login_complete(request, redirect_field_name=REDIRECT_FIELD_NAME):
 	else:
 		assert False, (
 			"Unknown OpenID response type: %r" % openid_response.status)
+
+
+def facebook_login_complete(request):
+	from datetime import datetime
+	from facebook import get_user_info, get_facebook_signature 
+	API_KEY = settings.FACEBOOK_API_KEY
+	API_SECRET = settings.FACEBOOK_API_SECRET
+	# FB Connect will set a cookie with a key == FB App API Key if the user has been authenticated
+	if API_KEY in request.COOKIES:
+		signature_hash = get_facebook_signature(API_KEY, API_SECRET, request.COOKIES, True)				
+		# The hash of the values in the cookie to make sure they're not forged
+		# AND If session hasn't expired
+		if(signature_hash == request.COOKIES[API_KEY]) and \
+				(datetime.fromtimestamp(float(request.COOKIES[API_KEY+'_expires'])) > datetime.now()):
+			#Log the user in now.
+			session_key = request.COOKIES[API_KEY + '_session_key']
+			user_info_response = get_user_info(API_KEY, API_SECRET, request.COOKIES, session_key)
+			if 'error' in user_info_response:
+				logging.error('Facebook login failed')
+				logging.error(user_info_response)
+				return render_failure(request, 'Facebook login failed')
+			
+			logging.info('Facebook login successful')
+			logging.info(user_info_response)
+			request.session['user_type'] = 'facebook'
+			request.session['user_name'] = user_info_response[0]['name']
+			request.session['user_url'] = user_info_response[0]['website'] or \
+					'http://www.facebook.com/profile.php?id=%s' %  user_info_response[0]['uid']
+			request.session['user_email'] = '%s@facebookuser.com' % user_info_response[0]['uid']
+		else:
+			logging.debug('Facebook cookies invalid')
+	else:
+		logging.debug('Facebook user not authenticated')
+			
+	return HttpResponseRedirect(request.GET.get('next', ''))

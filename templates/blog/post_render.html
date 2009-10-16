@@ -1,5 +1,4 @@
 {% load cache humanize blog_tags comment_tags markup_tags smart_if %}
-{% cache 6000 postcache object %}
 
 {% get_comment_count for object as comment_count %}
 
@@ -18,13 +17,22 @@
 			<span class="nickname">{{ object.author.first_name }}</span>
 		</cite>
 		<abbr class="published" title="{{ object.created_at }}">
-			<span class="date">{{ object.created_at|naturalday:'D, N d' }}</span>
+			<span class="date">
+			{% if now.year != object.created_at.year %}
+				{{ object.created_at|naturalday:'D, N d \'y' }}
+			{% else %}
+				{{ object.created_at|naturalday:'D, N d' }}
+			{% endif %}
+			</span>
 		</abbr>
 	</p>
 	<div class="content entry-content">
+		{% cache 1000000 blog-post object.pk %}
 		{{ object.body|render:object.markup }}
+		{% endcache %}
 	</div>
 	<ul class="meta">
+		{% cache 1000000 blog-meta object.pk %}
 		<li class="categories">Posted in
 		{% get_categories_for object as category_list %}
 		{% for category in category_list %}
@@ -40,8 +48,10 @@
 		<li>Meta
 			<a href="{{ object.get_absolute_url }}#comments">{{ comment_count }} comments</a>,
 			<a rel="bookmark" href="{{ object.get_absolute_url }}">permalink</a>
+			{% if user.is_staff %}
+			<a href="/admin/blog/post/{{ object.key }}/">admin</a>
+			{% endif %}
 		</li>
+		{% endcache %}
 	</ul>
 </div>
-
-{% endcache %}

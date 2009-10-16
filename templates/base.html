@@ -1,12 +1,18 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>{% block title %}Generic Page{% endblock %}</title>
 	<link href="{{ MEDIA_URL }}libcoffee.css" media="all" rel="stylesheet" type="text/css" />
 	<link rel="shortcut icon" href="{{ MEDIA_URL }}global/favicon.ico"/>
-	<link rel="alternate" type="application/rss+xml" title="RSS" href="/blog/feeds/latest/" />
+	{% if debug %}
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="/blog/feeds/latest/" />
+	{% else %}
+		<link rel="alternate" type="application/rss+xml" title="RSS"
+			href="http://feeds.feedburner.com/libcoffee" />
+	{% endif %}
 	<link rel="alternate" type="application/rss+xml" title="RSS for latest comments" href="/blog/feeds/comments/" />
+	<META name="y_key" content="df9eb06178cb5625">
 	{% block header %}{% endblock %}
 	{% block feed %}{% endblock %}
 </head>
@@ -14,7 +20,7 @@
 <div id="container">
 	<!-- Page header -->
 	<div id="header">
-		<h1><a href="/blog">{% block pagetitle %}libcoffee.net{% endblock %}</a></h1>
+		<h1><a href="/blog/">{% block pagetitle %}libcoffee.net{% endblock %}</a></h1>
 		<h2>:: Just another Django weblog ::</h2>
 	</div>
 	
@@ -35,10 +41,12 @@
 		<ul>
 			<li>
 				powered by <a href="http://www.djangoproject.com/">django</a> /
-				styled with <a href="http://quotedprintable.com/pages/scribbish">scribbish</a>
+				<a href="http://code.google.com/appengine/">appengine</a> /
+				<a href="http://quotedprintable.com/pages/scribbish">scribbish</a>
 			</li>
 		</ul>
 	</div>
 </div>
+{% include "analytics.html" %}
 </body>
 </html>

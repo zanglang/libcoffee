@@ -12,7 +12,7 @@ class CommentsAdmin(admin.ModelAdmin):
            {'fields': ('user', 'user_name', 'user_email', 'user_url', 'comment')}
         ),
         (_('Metadata'),
-           {'fields': ('submit_date', 'ip_address', 'is_public', 'is_removed')}
+           {'fields': ('user_type', 'submit_date', 'ip_address', 'is_public', 'is_removed')}
         ),
      )
 

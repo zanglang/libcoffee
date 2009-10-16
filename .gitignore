@@ -1,6 +1,12 @@
 .dynamic_media
 _generated_media
 common
+lib/dateutil
+lib/docutils
+lib/simplejson
+lib/openid
+lib/pygments
 lib/socialauth
 *.sqlite
 *.pyc
+test*.json*

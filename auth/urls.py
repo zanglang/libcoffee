@@ -14,4 +14,7 @@ urlpatterns = patterns('',
 	# Google
 	(r'google_login/$', views.google_login_begin),
 	(r'google_login/complete$', views.google_login_complete),
+	
+	# Facebook
+	(r'facebook_login/$', views.facebook_login_complete),
 )

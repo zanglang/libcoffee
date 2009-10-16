@@ -1,1 +1,2 @@
-{{ obj.user_name }}: {{ obj.comment }}
+{% load markup_tags %}
+{{ obj.user_name }} wrote: {{ obj.comment|striptags|render:'Markdown' }}

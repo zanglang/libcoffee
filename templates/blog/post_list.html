@@ -1,38 +1,15 @@
 {% extends 'base.html' %}
-{% load smart_if %}
 
-{% block title %}Libcoffee.net Blog{% endblock %}
+{% block title %}Libcoffee.net{% endblock %}
 
 {% block body %}
 {% for object in object_list %}
 
 {% include "blog/post_render.html" %}
 
+{% empty %}
+For some reason, there doesn't appear to be any posts.
 {% endfor %}
 
-{% if is_paginated %}
-<p class="pagination">
-
-{% if page_obj.has_previous %}
-	<a href="?page={{ page_obj.previous_page_number }}">previous</a>
-{% else %}
-	previous
-{% endif %}
-
-{% for page in paginator.page_range %}
-{% if page = page_obj.number %}{{ page }}
-{% else %}
-	<a href="?page={{ page }}">{{ page }}</a>
-{% endif %}
-{% endfor %}
-
-{% if page_obj.has_next %}
-	<a href="?page={{ page_obj.next_page_number }}">next</a>
-{% else %}
-	next
-{% endif %}
-
-</p>
-{% endif %}
-
+{% include "blog/paginate.html" %}
 {% endblock %}

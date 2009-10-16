@@ -178,7 +178,7 @@
 
 #content .entry .meta a:hover,
 #content .entry .meta a:active  {
-	color: #fff;
+	color: #000;
 }
 
 
@@ -273,6 +273,24 @@
 #content form.comments textarea { 
 	width: 90%; height: 150px;
 	padding: 3px;
+}
+
+#content a.openid {
+	background: url(/auth/openid_logo) no-repeat;
+	padding-left: 20px
+}
+#content a.google {
+	background: url(google.ico) no-repeat;
+	padding-left: 20px
+}
+#content a.facebook {
+	background: url(facebook.ico) no-repeat;
+	padding-left: 20px
+}
+#content a.openid:hover,
+#content a.google:hover,
+#content a.facebook:hover {
+	color: #000
 }
 
 /*--------------------------------------------------------------

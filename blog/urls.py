@@ -1,21 +1,19 @@
 from django.conf.urls.defaults import *
 from django.contrib.syndication.views import feed
-from blog.feeds import LatestPosts, PostCommentFeed
+from blog.feeds import LatestPosts, LatestComments, PostCommentFeed
 from blog.models import Post
-from blog import views
-from comments.feeds import LatestCommentFeed
+from blog import views, tasks
 
 info_dict = {
-	#'queryset': Post.objects.published(),
-	'queryset': Post.all(),
+	'queryset': Post.objects_published(),
 	'date_field': 'created_at',
 }
 
 urlpatterns = patterns('',
 
-	(r'feeds/(?P<url>.*?)/$', feed, {'feed_dict': {
+	(r'feeds/(?P<url>.*?)/?$', feed, {'feed_dict': {
 		'latest': LatestPosts,
-		'comments': LatestCommentFeed,
+		'comments': LatestComments,
 		'articles': PostCommentFeed
 	}}),
 	
@@ -34,6 +32,13 @@ urlpatterns = patterns('',
 	(r'category/(?P<slug>[-\w]+)/$', views.category_detail),
 
 	(r'categories/$', views.category_list),
+	
+	(r'fixtures/$', views.fixture_restore),
+	(r'fixtures/dump/$', views.fixture_dump),
+	
+	#(r'tasks/send_trackback/$', tasks.send_trackback),
+	(r'tasks/run_backup/$', tasks.run_backup),
+	(r'tasks/maintenance/$', tasks.maintenance),
 
 	(r'^$', views.post_list),
 )

@@ -7,7 +7,8 @@ from django.db.models.signals import post_save
 from akismet import Akismet
 from comments.forms import CommentForm
 from comments.models import Comment
-from comments.signals import comment_was_posted
+from comments.signals import comment_was_posted, comment_will_be_posted
+from google.appengine.api import mail, xmpp
 import logging
 
 def get_model():
@@ -21,12 +22,24 @@ def get_form_target():
 
 
 def new_comment_notify(sender, comment, request, *args, **kwargs):
-	if request.user.is_staff: return # don't bother to notify
-	subject = 'New comment on %s' % comment.content_object.title
-	message = '%s wrote:\n\n%s' % (comment.user_name, comment.comment)
-	logger.debug( 'sending mail for new comment')
-	send_mail(subject, message, 'noreply@libcoffee.net', ['admin@libcoffee.net'])
-	
+	#if request.user.is_staff: return # don't bother to notify
+	logging.debug('sending mail for new comment')
+	message = '%s left a comment:\n\n%s' % (comment.user_name, comment.comment)
+	try:
+		logging.debug('zanglang@gmail.com is %s' % \
+				xmpp.get_presence('zanglang@gmail.com'))
+		status = xmpp.send_message('zanglang@gmail.com', message)
+		logging.debug('Sent XMPP message status: %s' % status)
+		if status != xmpp.NO_ERROR:
+			mail.send_mail(sender='zanglang@gmail.com',
+					to='zanglang@gmail.com',
+					subject='New comment on %s' % comment.content_object.title,
+					body=message)
+	except:
+		logging.warning('Error sending notification', exc_info=True)
+		
+		
+
 def new_comment_check(sender, comment, request, *args, **kwargs):
 	if request.user.is_staff: return # don't bother to check
 	ak = Akismet(
@@ -46,16 +59,11 @@ def new_comment_check(sender, comment, request, *args, **kwargs):
 			'comment_author_email': comment.user_email.encode('utf-8'),			
 		}
 		if ak.comment_check(comment.comment.encode('utf-8'), data=data, build_data=True):
-			logger.info('marking comment as spam')
-			comment.flags.create(
-				user=comment.content_object.author,
-				flag='spam'
-			)
+			logging.info('marking comment as possibly spam')
 			comment.is_public = False
-			comment.save()
 		else:
-			logger.debug('comment is ham')
+			logging.debug('comment is ham')
 
 
-#comment_was_posted.connect(new_comment_check, dispatch_uid='comments-spam')
-#comment_was_posted.connect(new_comment_notify, dispatch_uid='comments')
+comment_will_be_posted.connect(new_comment_check, dispatch_uid='comments-spam')
+comment_was_posted.connect(new_comment_notify, dispatch_uid='comments')

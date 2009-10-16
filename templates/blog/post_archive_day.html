@@ -1,13 +1,18 @@
 {% extends 'base.html' %}
 
-{% block title %}Libcoffee.net Blog Archives for {{ day|date:'d M Y' }}{% endblock %}
+{% block title %}Libcoffee.net - Archives for {{ day|date:'d M Y' }}{% endblock %}
 
 {% block body %}
 {% for object in object_list %}
 
 {% include "blog/post_render.html" %}
 
+{% empty %}
+<p>
+	It would seem that the author has been procrastinating this day.<br/>
+	How disappointing.<br/>	
+</p>
 {% endfor %}
-{% endblock %}
 
-{# page count #}
+{% include "blog/paginate.html" %}
+{% endblock %}

@@ -112,6 +112,8 @@ class CommentDetailsForm(CommentSecurityForm):
         CommentModel = self.get_comment_model()
         new = CommentModel(**self.get_comment_create_data())
         new = self.check_for_duplicate_comment(new)
+        logging.debug(self.cleaned_data)
+        logging.debug(new.user_type)
         
         return new
         
@@ -136,6 +138,7 @@ class CommentDetailsForm(CommentSecurityForm):
             user_name    = self.cleaned_data["name"],
             user_email   = self.cleaned_data["email"],
             user_url     = self.cleaned_data["url"],
+            user_type    = self.data.get("user_type", ""),
             comment      = self.cleaned_data["comment"],
             submit_date  = datetime.datetime.now(),
             # site_id      = settings.SITE_ID,
@@ -189,7 +192,6 @@ class CommentForm(CommentDetailsForm):
     #                                label=_('If you enter anything in this field '\
     #                                        'your comment will be treated as spam'))
     honeypot = forms.CharField(required = False, widget = forms.widgets.HiddenInput())
-    auth_type = forms.CharField(required = False, widget = forms.widgets.HiddenInput())
 
     def clean_honeypot(self):
         """Check that nothing's been entered into the honeypot."""

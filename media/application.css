@@ -21,4 +21,4 @@ cite  { font-style: normal; }
 a img { border: none; padding: 0; margin: 0; }
 
 a:link,  a:visited { color: #930; }
-a:hover, a:active  { color: #fff; background: #000; }
+a:hover, a:active  { color: #000; }
