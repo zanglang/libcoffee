@@ -14,7 +14,7 @@ from memoize import memoize
 from ragendja.dbutils import get_object_or_404
 
 
-POSTS_PER_PAGE = 10
+POSTS_PER_PAGE = 5
 POST_CACHE_TIME = 1000000
 
 

@@ -34,7 +34,7 @@ def send_trackback(instance, **kwargs):
 	from google.appengine.api.labs import taskqueue
 	import copy
 	
-	#if settings.DEBUG: return # disable when debugging
+	if settings.DEBUG: return # disable when debugging
 	if not settings.DEBUG and type(instance) is Post \
 		and (not instance.published or instance._was_published):
 			return
@@ -74,7 +74,7 @@ def send_trackback(instance, **kwargs):
 
 
 def send_ping(instance, **kwargs):
-	#if settings.DEBUG: return # disable when debugging
+	if settings.DEBUG: return # disable when debugging
 	if type(instance) is Post:
 		if not instance.published or instance._was_published:
 			return

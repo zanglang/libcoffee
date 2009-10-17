@@ -57,7 +57,7 @@ class LatestPosts(Feed):
 	def items(self):
 		posts = deserialize_models(memcache.get('feed-latest-posts'))
 		if not posts:
-			posts = Post.objects_published().order('-updated_at').fetch(30)
+			posts = Post.objects_published().order('-created_at').fetch(30)
 			memcache.set('feed-latest-posts', serialize_models(posts))
 		return posts
 	
