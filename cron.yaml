@@ -9,7 +9,7 @@ cron:
   schedule: every 6 hours
 
 - description: Exception report
-  url: /_ereporter?sender=zanglang@gmail.com
+  url: /_ereporter/?sender=zanglang@gmail.com
   schedule: every 12 hours
 
 - description: Download twitter

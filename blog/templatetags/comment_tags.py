@@ -69,7 +69,8 @@ class BaseCommentNode(template.Node):
             return self.comment_model.all().filter('False =', True) # facepalm
 
         qs = self.comment_model.all() \
-            .filter('content_object =', object)
+            .filter('content_object =', object) \
+            .order('submit_date')
 			#.filter('site =', Site.objects.get_current())
 			#content_type = ctype,
             #object_pk    = smart_unicode(object_pk),

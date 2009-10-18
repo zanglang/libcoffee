@@ -1,36 +1,24 @@
 {% load blog_tags %}
 
 <!-- Navigation sidebar -->
-<div id="sidebar">
 {% block sidebar %}
 
 {% include 'profile.html' %}
 
-<h3>Categories</h3>
-<ul id="categories">
+<h4>Categories</h4>
+<ul>
 {% get_blog_categories as category_list %}
 {% for category in category_list %}
 	<li><a href="{{ category.get_absolute_url }}">{{ category.title }}</a></li>
 {% endfor %}
 </ul>
 
-<h3>Archives</h3>
-<ul id="archives">
+<h4>Archives</h4>
+<ul>
 {% get_month_list as month_list %}
 {% for blog_month in month_list %}
 	<li><a href="/blog/{{ blog_month|date:'Y/m/' }}">{{ blog_month|date:'F Y' }}</a></li>
 {% endfor %}
 </ul>
 
-<h3>Recent Comments</h3>
-<ul>
-{% get_latest_comments 5 as latest_comments %}
-{% for comment in latest_comments %}
-	<li><a href="{{ comment.get_absolute_url }}">
-		by {{ comment.user_name }} on {{ comment.content_object.title }}
-	</a></li>
-{% endfor %}
-</ul>
-
 {% endblock %}
-</div>

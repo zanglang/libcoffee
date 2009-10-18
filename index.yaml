@@ -64,6 +64,13 @@ indexes:
   - name: is_public
   - name: is_removed
   - name: submit_date
+
+- kind: django_comments
+  properties:
+  - name: content_object
+  - name: is_public
+  - name: is_removed
+  - name: submit_date
     direction: desc
 
 - kind: django_comments

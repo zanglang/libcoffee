@@ -1,27 +1,29 @@
 {% load cache trackback_tags %}
 {% cache 1000000 trackbacks object.pk %}
-
 {% get_trackbacks_for object as trackback_list %}
 
-<h5><a name="trackbacks">Trackbacks</a></h5>
-<p>
-    Use these links to
-    	<a href="{% get_trackback_url object %}" title="Trackback URL">trackback</a> or
-    	<a href="{% get_pingback_url %}" title="Pingback URL">pingback</a>
-    	from your own site.<br/>
-</p>
-
-<ol class="trackbacks" id="trackbacks">
+<div id="trackbacks">
+	<h3>Trackbacks</h3>
+	<a name="trackbacks"></a>
+	<p>
+	    Use these links to
+	    	<a href="{% get_trackback_url object %}" title="Trackback URL">trackback</a> or
+	    	<a href="{% get_pingback_url %}" title="Pingback URL">pingback</a>
+	    	from your own site.<br/>
+	</p>
+	
+	<ol>
 {% for trackback in trackback_list %}
-  <li class="trackback">
-  <div class="author">
-    <a rel="nofollow" href="{{ trackback.url }}">{{ trackback.title }}</a>
-  </div>
-  <div class="content">
-    [...] {{ trackback.excerpt }} [...]
-  </div>
-</li>
+		<li class="trackback">
+			<div class="author">
+				<a rel="nofollow" href="{{ trackback.url }}">{{ trackback.title }}</a>
+			</div>
+			<div>
+				[...] {{ trackback.excerpt }} [...]
+			</div>
+		</li>
 {% endfor %}
-</ol>
+	</ol>
+</div>
 
 {% endcache %}

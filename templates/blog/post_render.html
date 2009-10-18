@@ -2,19 +2,19 @@
 
 {% get_comment_count for object as comment_count %}
 
-<div class="entry hentry">
+<div class="hentry">
 	<h2 class="title">
 		<a class="entry-title bookmark" href="{{ object.get_absolute_url }}">
 			{{ object.title }}
 		</a>
 		{% if comment_count > 0 %}
-			<span class="comment_count">{{ comment_count }}</span>
+			<sup title="{{ comment_count }} comments">{{ comment_count }}</sup>
 		{% endif %}
 	</h2>
-	<p class="vcard author">
+	<div class="vcard append-bottom last">
 		Posted by
-		<cite class="fn" title="{{ object.author.get_full_name }}">
-			<span class="nickname">{{ object.author.first_name }}</span>
+		<cite class="author" title="{{ object.author.get_full_name }}">
+			<span class="n nickname">{{ object.author.first_name }}</span>
 		</cite>
 		<abbr class="published" title="{{ object.created_at }}">
 			<span class="date">
@@ -25,33 +25,34 @@
 			{% endif %}
 			</span>
 		</abbr>
-	</p>
-	<div class="content entry-content">
+	</div>
+	<div class="entry-content last">
 		{% cache 1000000 blog-post object.pk %}
 		{{ object.body|render:object.markup }}
 		{% endcache %}
 	</div>
-	<ul class="meta">
+	<div class="meta last small">
 		{% cache 1000000 blog-meta object.pk %}
-		<li class="categories">Posted in
-		{% get_categories_for object as category_list %}
-		{% for category in category_list %}
-			<a rel="tag" href="{{ category.get_absolute_url }}">
-				{{ category.title }}</a>
-		{% empty %}
-			Uncategorized
-		{% endfor %}
-		<abbr class="published" title="{{ object.updated_at }}">
-			{{ object.created_at|timesince }} ago
-		</abbr>
-		</li>
-		<li>Meta
-			<a href="{{ object.get_absolute_url }}#comments">{{ comment_count }} comments</a>,
-			<a rel="bookmark" href="{{ object.get_absolute_url }}">permalink</a>
+		<div class="span-10">
+			Posted in
+			{% get_categories_for object as category_list %}
+			{% for category in category_list %}
+				<a rel="tag" href="{{ category.get_absolute_url }}">
+					{{ category.title }}</a>
+			{% empty %}
+				Uncategorized
+			{% endfor %}
+			<abbr class="published" title="{{ object.updated_at }}">
+				{{ object.created_at|timesince }} ago
+			</abbr>
+			<a rel="bookmark" href="{{ object.get_absolute_url }}">#</a>
 			{% if user.is_staff %}
-			<a href="/admin/blog/post/{{ object.key }}/">admin</a>
+				<a href="/admin/blog/post/{{ object.key }}/">@</a>
 			{% endif %}
-		</li>
+		</div>
+		<div class="push-1 last">
+			<a href="{{ object.get_absolute_url }}#comments">{{ comment_count }} comments</a>
+		</div>
 		{% endcache %}
-	</ul>
+	</div>
 </div>

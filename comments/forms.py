@@ -91,9 +91,12 @@ class CommentDetailsForm(CommentSecurityForm):
     """
     Handles the specific details of the comment (name, comment, etc.).
     """
-    name          = forms.CharField(label=_("Name"), max_length=50)
-    email         = forms.EmailField(label=_("Email address"))
-    url           = forms.URLField(label=_("URL"), required=False)
+    name          = forms.CharField(label=_("Name"), max_length=50,
+								widget=forms.TextInput(attrs={'class':'text'}))
+    email         = forms.EmailField(label=_("Email address"),
+								widget=forms.TextInput(attrs={'class':'text'}))
+    url           = forms.URLField(label=_("URL"), required=False,
+								widget=forms.TextInput(attrs={'class':'text'}))
     comment       = forms.CharField(label=_('Comment'), widget=forms.Textarea,
                                     max_length=COMMENT_MAX_LENGTH)
 
