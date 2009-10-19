@@ -1,62 +1,24 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml" xml:lang="en" lang="en" dir="ltr">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<title>{% block title %}Generic Page{% endblock %}</title>
 	<link rel="stylesheet" href="{{ MEDIA_URL }}libcoffee.css" type="text/css" media="screen, projection"/>
 	<link rel="stylesheet" href="{{ MEDIA_URL }}libcoffee-print.css" type="text/css" media="print"/>
 	<!--[if lt IE 8]><link rel="stylesheet" href="{{ MEDIA_URL }}ie.css" type="text/css" media="screen, projection"/><![endif]-->
-	<link rel="shortcut icon" href="{{ MEDIA_URL }}global/icons/favicon.ico"/>
-	
+	<link rel="copyright" href="http://creativecommons.org/licenses/by-sa/3.0/" />
+	<link rel="shortcut icon" href="{{ MEDIA_URL }}global/favicon.ico"/>
 	{% if debug %}
 		<link rel="alternate" type="application/rss+xml" title="RSS" href="/blog/feeds/latest/" />
+		<link rel="alternate" type="application/rss+xml" title="RSS for latest comments" href="/blog/feeds/comments/" />
 	{% else %}
-		<link rel="alternate" type="application/rss+xml" title="RSS"
-			href="http://feeds.feedburner.com/libcoffee" />
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="http://feeds.feedburner.com/libcoffee" />
+		<link rel="alternate" type="application/rss+xml" title="RSS for latest comments" href="http://feeds.feedburner.com/libcoffeecomments" />
 	{% endif %}
 	{% block header %}{% endblock %}
 	{% block feed %}{% endblock %}
-	
-	<link rel="alternate" type="application/rss+xml" title="RSS for latest comments" href="/blog/feeds/comments/" />
 	<meta name="y_key" content="df9eb06178cb5625"/>
-	<style type="text/css">
-		body { background: transparent url({{MEDIA_URL}}global/background.gif) repeat-x scroll left top }
-		#header h1 { font-size: 400%; font-weight: bold; margin-bottom: 0.1em; letter-spacing: -5px }
-		#header a { color: black; text-decoration:none }
-		#header a:hover, a:active { color: #993300; }
-		#content .hentry { margin-bottom: 3em }
-		#content .hentry .title { margin-bottom: 0px; font-weight: bold; letter-spacing: -1.5px; line-height: 94% }
-		#content .hentry .title sup { color: #BBB }
-		#content .hentry .title a { text-decoration: none }
-		#content .hentry .vcard { color: #BBB; font-size: 1.2em; letter-spacing: -1px; line-height: 1.2em }
-		#content .hentry .vcard .published { color: #AAA; font-weight: bold; }
-		#content .hentry .meta { background: #EEE; border: 1px solid #DDD; padding: 5px 5px 1.7em; line-height: 13px }
-		#content .hentry .meta a { color: #555; }
-		#content .hentry p + p { margin-top: 0 }
-		#content .vcard abbr, #content .hentry .meta abbr { border-bottom: none }
-		#sidebar { font-size: 90% }
-		#sidebar h4 { font-weight: bold; margin-bottom: 0.5em }
-		#sidebar ul { list-style-type: none; margin-bottom: 2em }
-		#footer { font-size: 90% }
-		a { color: #993300; }
-		a:hover, a:active { color: black }
-		pre, code, tt { background: #FFF }
-		#comments > h3, #trackbacks > h3 {
-				background: #FFFFDD; color: #000; border-bottom: 1px dotted #AAA; margin-bottom: 0px;
-				font-weight: bold; letter-spacing: -1px; line-height: 1.5em }
-		#comments > ol, #trackbacks > ol { list-style-type: none; margin-left: 0px }
-		#comments li.comment { border: 2px solid #DDDDDD; margin-bottom: 1.5em; padding: 1em }
-		#comments li.comment.isauthor { background: #FFFFCC; border: 1px solid #FAB444 }
-		#comments li.comment .vcard { margin-bottom: 1em }
-		#comments li.comment .vcard .author { font-size: 1.3em; font-style: normal; font-weight: bold }
-		#comments li.comment .vcard .submitted { color: #999; font-weight: bold }
-		#commentform fieldset { background: #F2F2F2 }
-		#commentform .fields { border-right: 1px dotted #AAA }
-		.gravatar { float: right; margin: 0 0 0.5em 1em }
-		#content a.openid { background: url({{ MEDIA_URL }}global/openid.ico) no-repeat; padding-left: 20px }
-		#content a.google { background: url({{ MEDIA_URL }}global/google.ico) no-repeat; padding-left: 20px }
-		#content a.facebook { background: url({{ MEDIA_URL }}global/facebook.ico) no-repeat; padding-left: 20px }
-	</style>
 </head>
 <body>
 <div class="container">

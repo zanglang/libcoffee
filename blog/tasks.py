@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.core.management import call_command
 from django.http import HttpResponse
@@ -31,7 +32,7 @@ def run_backup(request):
 	# recompress
 	data = compress_string(data.getvalue())
 	logging.info('Compressed to %d bytes.' % len(data))
-	mail.send_mail(sender='zanglang@gmail.com', to='zanglang@gmail.com',
+	mail.send_mail(sender=settings.ADMIN_EMAIL, to=settings.ADMIN_EMAIL,
 				subject='Libcoffee.net Backup for %s' % str(datetime.now()),
 				body='See compressed attachment.',
 				attachments=(('test.txt', data),))

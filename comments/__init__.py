@@ -26,13 +26,11 @@ def new_comment_notify(sender, comment, request, *args, **kwargs):
 	logging.debug('sending mail for new comment')
 	message = '%s left a comment:\n\n%s' % (comment.user_name, comment.comment)
 	try:
-		logging.debug('zanglang@gmail.com is %s' % \
-				xmpp.get_presence('zanglang@gmail.com'))
-		status = xmpp.send_message('zanglang@gmail.com', message)
+		status = xmpp.send_message(settings.ADMIN_EMAIL, message)
 		logging.debug('Sent XMPP message status: %s' % status)
 		if status != xmpp.NO_ERROR:
-			mail.send_mail(sender='zanglang@gmail.com',
-					to='zanglang@gmail.com',
+			mail.send_mail(sender=settings.ADMIN_EMAIL,
+					to=settings.ADMIN_EMAIL,
 					subject='New comment on %s' % comment.content_object.title,
 					body=message)
 	except:
