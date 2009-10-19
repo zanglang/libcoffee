@@ -44,5 +44,6 @@ urlpatterns += auth_patterns + patterns('',
 			'blog.views.redirect_to_blog'),
 	(r'^(?P<year>\d{4})/((?P<month>\d{2})/)?(?P<day>\d{1,2})*',
 			'blog.views.redirect_to_blog'),
+	(r'^category/*', 'blog.views.redirect_to_blog'),
 	(r'^xml/*', redirect_to, {'url': 'http://feeds.feedburner.com/libcoffee', 'permanent': True}),
 )
