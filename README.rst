@@ -43,6 +43,8 @@ After that, it's the same as starting up Django's development server::
 - `python-openid <http://openidenabled.com/python-openid/>`_
 - `python-simplejson <http://www.undefined.org/python/>`_
 - `python-docutils <http://docutils.sourceforge.net/>`_ (optional)
+- `django-openid-auth <http://github.com/zanglang/django-openid-auth-appengine>`_
+  (AppEngine port)
 
 Some libraries are already checked in to Git...
 
@@ -51,6 +53,11 @@ Some libraries are already checked in to Git...
 - `python-feedparser <http://www.feedparser.org/>`_
 - `python-markdown <http://www.freewisdom.org/projects/python-markdown/>`_
 - `python-textile <http://loopcore.com/python-textile/>`_
+
+Also included are a few Django apps ported to App Engine, and heavily modified:
+
+- django.contrib.comments
+- `django-trackback <http://code.google.com/p/django-trackback/>`_
 
 All libraries are expected to be in the ``lib/`` folder, or in a ZIP archive and
 placed in ``common/zip-packages``.
