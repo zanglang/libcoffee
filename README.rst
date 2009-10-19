@@ -2,8 +2,6 @@
 
 Libcoffee.net Blog Engine
 =========================
-for Google App Engine
----------------------
 :Author: Jerry Chong
 :Contact: zanglang@gmail.com
 :Website: http://www.libcoffee.net/
@@ -15,16 +13,16 @@ for Google App Engine
 1. Introduction
 ---------------
 This is the codebase used for the blog application at http://www.libcoffee.net/.
-Libcoffee.net is written based on the `Django<http://www.djangoproject.com>`_
+Libcoffee.net is written based on the `Django <http://www.djangoproject.com>`_
 framework, and is intended to be run on a
-`Google App Engine<http://code.google.com/appengine/>`_ account.
+`Google App Engine <http://code.google.com/appengine/>`_ account.
 
 
 2. Installation
 ---------------
 Libcoffee.net depends on a bunch of Python libraries and some custom Django apps
-that were ported to App Engine's BigTable. Check out the `Dependencies`_ section
-for details. Fill out ``settings.py`` for app configuration, or use
+that were ported to App Engine's BigTable. Check out the `3. Dependencies`_
+section for details. Fill out ``settings.py`` for app configuration, or use
 ``localsettings.py`` if you prefer.
 
 After that, it's the same as starting up Django's development server::
@@ -47,6 +45,7 @@ After that, it's the same as starting up Django's development server::
 - python-docutils (for reStructuredText, optional)
 
 Some libraries are already checked in to Git...
+
 - BeautifulSoup
 - PyFacebook
 - python-feedparser
