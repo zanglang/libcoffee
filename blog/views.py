@@ -1,9 +1,9 @@
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.admin.views.decorators import staff_member_required
 from django.core import serializers
 from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.views.decorators.cache import cache_page
+from django.views.decorators.cache import cache_page, never_cache
 from django.views.generic import list_detail
 from blog.models import *
 from datetime import datetime, timedelta
@@ -116,7 +116,15 @@ def category_detail(request, slug, page=0):
 		template_name = 'blog/post_list.html')
 
 
-@user_passes_test(lambda u: u.is_staff)
+@never_cache
+@staff_member_required
+def post_preview(request, object_id):
+	return list_detail.object_detail(request,
+		object_id = object_id,
+		queryset = Post.all())
+
+
+@staff_member_required
 def fixture_restore(request):
 	from blog.forms import UploadFixtureForm
 	from google.appengine.ext import db
@@ -158,7 +166,7 @@ def fixture_restore(request):
 		}, context_instance=RequestContext(request))
 
 
-@user_passes_test(lambda u: u.is_staff)
+@staff_member_required
 def fixture_dump(request):
 	""" Generates additional fixtures complementary to dumpdata, mainly for
 		ragendja's KeyListProperty """

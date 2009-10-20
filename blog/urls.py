@@ -1,7 +1,9 @@
 from django.conf.urls.defaults import *
 from django.contrib.syndication.views import feed
+from django.views.generic.create_update import create_object, update_object
 from blog.feeds import LatestPosts, LatestComments, PostCommentFeed
 from blog.models import Post
+from blog.forms import PostForm
 from blog import views, tasks
 
 info_dict = {
@@ -32,6 +34,8 @@ urlpatterns = patterns('',
 	(r'category/(?P<slug>[-\w]+)/$', views.category_detail),
 
 	(r'categories/$', views.category_list),
+	
+	(r'preview/(?P<object_id>.+)/$', views.post_preview, {}, 'preview-post'),
 	
 	(r'fixtures/$', views.fixture_restore),
 	(r'fixtures/dump/$', views.fixture_dump),

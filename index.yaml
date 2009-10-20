@@ -54,6 +54,12 @@ indexes:
 
 - kind: django_admin_log
   properties:
+  - name: content_type
+  - name: object_id
+  - name: action_time
+
+- kind: django_admin_log
+  properties:
   - name: user
   - name: action_time
     direction: desc
