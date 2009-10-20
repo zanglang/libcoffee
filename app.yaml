@@ -38,6 +38,10 @@ handlers:
   script: common/appenginepatch/main.py
   login: admin
 
+- url: /zipme
+  script: lib/zipme.py
+  login: admin
+
 - url: /.*
   script: common/appenginepatch/main.py
   secure: optional

@@ -23,7 +23,7 @@ framework, and is intended to be run on a
 Libcoffee.net depends on a bunch of Python libraries and some custom Django apps
 that were ported to App Engine's BigTable. Check out the Dependencies section
 for details. Fill out ``settings.py`` for app configuration, or use
-``localsettings.py`` if you prefer.
+``local_settings.py`` if you prefer.
 
 After that, it's the same as starting up Django's development server::
 
