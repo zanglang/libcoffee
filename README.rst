@@ -18,7 +18,21 @@ framework, and is intended to be run on a
 `Google App Engine <http://code.google.com/appengine/>`_ account.
 
 
-2. Installation
+2. Features
+-----------
+Basic features:
+
+- Basic blog authoring and publishing with plain URLs eg 'blog/2009/12/31/slug'
+- Comments with Google, OpenID and Facebook identities
+- Content markup with reStructuredText, Markdown and Textile
+- XMPP and email notifications for new comments
+- Clean default template with Blueprint CSS, hAtom microformats
+- Code block syntax highlighting
+- Trackbacks and pingbacks
+- Automated datastore backup via email
+
+
+3. Installation
 ---------------
 Libcoffee.net depends on a bunch of Python libraries and some custom Django apps
 that were ported to App Engine's BigTable. Check out the Dependencies section
@@ -33,7 +47,7 @@ After that, it's the same as starting up Django's development server::
   common/.google_appengine/appcfg.py update .
 
 
-3. Dependencies
+4. Dependencies
 ---------------
 - `app-engine-patch <http://code.google.com/p/app-engine-patch/>`_
 - Django 1.1 (bundled with app-engine-patch)
