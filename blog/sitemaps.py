@@ -26,6 +26,9 @@ class BlogSitemap(Sitemap):
 
 def send_sitemap(sender, sitemap_url=None, **kwargs):
 	if settings.DEBUG: return
+	if type(sender) is Post:
+		if not sender.published or sender._was_published:
+			return
 	URLS = (
 		('google', 'http://www.google.com/webmasters/tools/ping'),
 		('yahoo', 'http://search.yahooapis.com/SiteExplorerService/V1/ping'),

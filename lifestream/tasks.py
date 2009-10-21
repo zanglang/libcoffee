@@ -9,7 +9,7 @@ import logging, re
 
 
 def update_twitter(request):
-	TWITTER_URL = 'https://twitter.com/statuses/user_timeline/%s.rss' % \
+	TWITTER_URL = 'http://twitter.com/statuses/user_timeline/%s.rss' % \
 				settings.TWITTER_USERNAME	
 	data = feedparser.parse(TWITTER_URL)
 	if data.has_key('bozo_exception'):
