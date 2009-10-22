@@ -60,7 +60,7 @@ p.incr, .incr p {
 /* Surround uppercase words and abbreviations with this class.
    Based on work by Jørgen Arnor Gårdsø Lom [http://twistedintellect.com/] */
    
-.caps { 
+/*.caps { 
   font-variant: small-caps; 
   letter-spacing: 1px; 
   text-transform: lowercase; 
@@ -68,4 +68,4 @@ p.incr, .incr p {
   line-height:1%;
   font-weight:bold;
   padding:0 2px;
-}
+}*/
