@@ -5,7 +5,7 @@ from blog.models import Post
 from blog.tasks import send_trackback as send_trackback_task
 from trackback import registry
 from google.appengine.ext.deferred import deferred
-import logging, re, urllib, xmlrpclib
+import logging, re, urllib, urllib2, xmlrpclib
 
 URL_RE = re.compile(r'\b((https?|ftp|file)://[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])', re.IGNORECASE)
 
@@ -80,6 +80,9 @@ def send_ping(instance, **kwargs):
 			return
 	logging.debug('sending rpc pings')
 	site = Site.objects.get_current()
+	domain = 'http://%s' % site.domain
+	instance_url = 'http://%s%s' % (site.domain, instance.get_absolute_url())
+	
 	URLS = (
 		('technorati', 'http://rpc.technorati.com/rpc/ping'),
 		('google', 'http://blogsearch.google.com/ping/RPC2'),
@@ -88,8 +91,7 @@ def send_ping(instance, **kwargs):
 	for (name, url) in URLS:
 		try:
 			rpc = xmlrpclib.Server(url);
-			result = rpc.weblogUpdates.ping(site.name, 'http://%s' % site.domain,
-					'http://%s%s' % (site.domain, instance.get_absolute_url()))
+			result = rpc.weblogUpdates.ping(site.name, domain, instace_url)
 			if result['flerror']:
 				logging.warn('Error pinging %s (%s). Reason: %s' % 
 							(url, name, result['message']))
@@ -97,6 +99,14 @@ def send_ping(instance, **kwargs):
 				logging.info('pinging %s (%s) successful' % (url, name))
 		except Exception:
 			logging.debug('Error sending XMLRPC', exc_info=True)
+	
+	data = urllib.urlencode({
+		'hub.url': 'http://%s/blog/feeds/latest/' % site.domain,
+		'hub.mode': 'publish'
+	})
+	response = urllib2.urlopen(settings.HUBBUB_URL, data)
+	if response.status_code / 100 != 2:
+		logging.warning("Hub ping failed", response.status_code, response.content)
 	return
 
 
