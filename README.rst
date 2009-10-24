@@ -54,18 +54,18 @@ After that, it's the same as starting up Django's development server::
 - Google App Engine SDK (latest, follow aep's setup instructions)
 - `pygments <http://pygments.org/>`_
 - `python-dateutil <http://labix.org/python-dateutil>`_
-- `python-openid <http://openidenabled.com/python-openid/>`_
-- `python-simplejson <http://www.undefined.org/python/>`_
 - `python-docutils <http://docutils.sourceforge.net/>`_ (optional)
+- `python-markdown 2.0 <http://www.freewisdom.org/projects/python-markdown/>`_
+- `python-openid <http://openidenabled.com/python-openid/>`_
 - `django-openid-auth <http://github.com/zanglang/django-openid-auth-appengine>`_
   (AppEngine port)
+- `python-simplejson <http://www.undefined.org/python/>`_
 
 Some libraries are already checked in to Git...
 
 - `BeautifulSoup <http://www.crummy.com/software/BeautifulSoup/>`_
-- PyFacebook
+- Facebook Python API, from django-socialauth
 - `python-feedparser <http://www.feedparser.org/>`_
-- `python-markdown <http://www.freewisdom.org/projects/python-markdown/>`_
 - `python-textile <http://loopcore.com/python-textile/>`_
 
 Also included are a few Django apps ported to App Engine, and heavily modified:

@@ -18,7 +18,7 @@ def generate_pygments_css(path=None):
 		import os
 		path = os.path.join(os.getcwd(),'pygments.css')
 	f = open(path,'w')
-	f.write(HtmlFormatter().get_style_defs('.highlight'))
+	f.write(HtmlFormatter().get_style_defs('.sourcecode'))
 	f.close()
 
 
@@ -31,36 +31,41 @@ def render(content, type=None):
 		return '<p>' + unicode(content) + '</p>'
 	
 	try: # this structure feels quite bizarre...
-		markeddown = {
-			'reStructuredText': restructuredtext,
-			'Markdown': markdown,
-			'Textile': textile,
-			None: wrap_plaintext
-		}[type](unicode(content))
+		# Activate markdown extensions
+		markedup = type == 'Markdown' and \
+			markdown(unicode(content), arg='extra') or {
+				'reStructuredText': restructuredtext,
+				'Textile': textile,
+				None: wrap_plaintext
+			}[type](unicode(content)) 			
 	except Exception, e:
 		logging.warn('Error rendering as %s' % (type), exc_info=True)
-		markeddown = wrap_plaintext(content) # just wrap with paragraph
+		markedup = wrap_plaintext(content) # just wrap with paragraph
+	
+	# reST doesn't need highlighting using rst_directive.py
+	if type == 'reStructuredText':
+		return markedup
 	
 	# Replace the pulled code blocks with syntax-highlighted versions.
-	soup = BeautifulSoup(markeddown)
-	code_blocks = soup.findAll('code')
-	formatter = HtmlFormatter()
-	for block in code_blocks:
-		chunk = block.renderContents()
-		if block.has_key('class'):
+	formatter = HtmlFormatter(cssclass='sourcecode')
+	soup = BeautifulSoup(markedup)
+	# markdown and textile recommend <pre><code></pre> blocks
+	for block in soup.findAll('pre'):
+		chunk = block.code
+		if chunk is None:
+			continue # no wrapped code blocks		
+		if chunk.has_key('class'):
 			# <code class='python'>python code</code>
 			try:
-				lexer = get_lexer_by_name(block['class'], stripnl=True, encoding='UTF-8')
+				lexer = get_lexer_by_name(chunk['class'], stripnl=True, encoding='UTF-8')
 			except ValueError, e:
-				# <code>plain text, whitespace-preserved</code>
-				lexer = get_lexer_by_name('text', stripnl=True, encoding='UTF-8')
+				continue # keep it untouched
 		else:
 			try:
 				# Guess a lexer by the contents of the block.
-				lexer = guess_lexer(chunk)
+				lexer = guess_lexer(chunk.renderContents())
 			except ValueError, e:
-				# <code>plain text, whitespace-preserved</code>
-				lexer = get_lexer_by_name('text', stripnl=True, encoding='UTF-8')
-		# Just make it plain text.
-		block.replaceWith(highlight(chunk, lexer, formatter))
+				continue # keep it untouched
+		block.replaceWith(highlight(chunk.renderContents(), lexer, formatter))
+		
 	return mark_safe(str(soup))

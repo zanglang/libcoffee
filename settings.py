@@ -194,6 +194,8 @@ FACEBOOK_API_SECRET = ''
 
 TWITTER_USERNAME = ''
 
+HUBBUB_URL = 'http://pubsubhubbub.appspot.com/'
+
 TEMPLATE_STRING_IF_INVALID = ''
 TEMPLATE_CONTEXT_PROCESSORS = (
 	'django.core.context_processors.auth',

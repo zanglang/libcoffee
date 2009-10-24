@@ -4,10 +4,11 @@ _generated_media
 common
 lib/dateutil
 lib/docutils
-lib/simplejson
+lib/markdown
 lib/openid
 lib/pygments
+lib/simplejson
 lib/socialauth
-*.sqlite
 *.pyc
+*.sqlite
 test*.json*
