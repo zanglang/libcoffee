@@ -12,7 +12,7 @@
 {% cache 1000000 flatpage flatpage.pk %}
 <div class="entry hentry">
 	<div class="content entry-content">
-		{{ flatpage.content|render:'Textile' }}
+		{{ flatpage.content|render:'Markdown' }}
 	</div>
 </div>
 {% endcache %}
