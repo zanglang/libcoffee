@@ -65,7 +65,7 @@ class Post(db.Model):
 		
 	def save(self, *args, **kwargs):
 		if not self.slug:
-			self.slug = title.replace(' ', '').lower()
+			self.slug = self.title.replace(' ', '').lower()
 		if not self.created_at: # not sure why it's empty
 			self.created_at = datetime.now()
 		super(Post, self).save(*args, **kwargs)
@@ -85,8 +85,9 @@ class Post(db.Model):
 		return Post.all().filter('published =', True)
 	
 signals.pre_delete.connect(cleanup_relations, sender=Post)
-from blog.ping import *
+from blog.ping import send_trackback, send_ping, trackback_check
 from trackback.models import Trackback
+import blog.metaweblog
 signals.post_save.connect(send_trackback, sender=Post, dispatch_uid='send-trackback')
 signals.post_save.connect(send_ping, sender=Post, dispatch_uid='send-ping')
 signals.post_save.connect(trackback_check, sender=Trackback, dispatch_uid='trackback-filter')

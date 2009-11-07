@@ -142,6 +142,7 @@ INSTALLED_APPS = (
 	
 	# External apps
 	'django_openid_auth',
+	'django_xmlrpc',
 	
 	# App engine
 	'appenginepatcher',
@@ -161,6 +162,7 @@ IGNORE_APP_SETTINGS = IGNORE_APP_URLSAUTO = (
 	'django.contrib.auth',
 	'trackback',
 	'comments',
+	'django_xmlrpc',
 )
 
 # Remote access to production server (e.g., via manage.py shell --remote)

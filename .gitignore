@@ -2,12 +2,11 @@ local_settings.py
 .dynamic_media
 _generated_media
 common
-lib/dateutil
 lib/docutils
+lib/django_xmlrpc
 lib/markdown
 lib/openid
 lib/pygments
-lib/simplejson
 lib/socialauth
 *.pyc
 *.sqlite

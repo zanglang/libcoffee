@@ -31,6 +31,8 @@ urlpatterns += auth_patterns + patterns('',
 	(r'^sitemap.xml$', sitemap, {'sitemaps': {
 			'blog': sitemaps.BlogSitemap, 
 			'flatpages': FlatPageSitemap }}),
+	
+	(r'^xmlrpc/', 'django_xmlrpc.views.handle_xmlrpc'),
 		
 	(r'^xd_receiver.htm$', direct_to_template, {'template': 'auth/xd_receiver.htm'}),
 	
