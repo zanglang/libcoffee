@@ -1,6 +1,5 @@
 from django.contrib.sites.models import Site
 from django.contrib.syndication.feeds import Feed, FeedDoesNotExist
-from django.conf import settings
 from django.core.cache import cache as memcache
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
@@ -18,6 +17,7 @@ class CustomFeed(Rss201rev2Feed):
 	def rss_attributes(self):
 		attrs = super(CustomFeed, self).rss_attributes()
 		attrs.update({
+			'xmlns:atom': 'http://www.w3.org/2005/Atom',
 			'xmlns:wfw': 'http://wellformedweb.org/CommentAPI/',
 			'xmlns:geo': 'http://www.w3.org/2003/01/geo/wgs84_pos#',
 			'xmlns:trackback': 'http://madskills.com/public/xml/rss/module/trackback/',
@@ -27,10 +27,9 @@ class CustomFeed(Rss201rev2Feed):
 	def add_root_elements(self, handler):
 		super(CustomFeed, self).add_root_elements(handler)
 		handler.addQuickElement('generator', 'Libcoffee.net/Django')
-		handler.addQuickElement('webMaster', settings.ADMIN_EMAIL)
+		handler.addQuickElement('webMaster', 'admin@libcoffee.net (Jerry Chong)')
 		handler.addQuickElement('geo:lat', '3.106789')
 		handler.addQuickElement('geo:long', '101.592145')
-
 
 class CustomPostFeed(CustomFeed):
 	""" Custom feed generator that implements custom feedback-based RSS extensions.
@@ -44,7 +43,7 @@ class CustomPostFeed(CustomFeed):
 				reverse('receive_trackback', kwargs={'object_id': item['key']})))
 		handler.addQuickElement('wfw:commentRss',
 				item['link'].replace('blog', 'blog/feeds/articles'))
-		handler.addQuickElement('slash:comments', item['comments'])
+		handler.addQuickElement('slash:comments', item['comment_count'])
 
 
 class LatestPosts(Feed):
@@ -82,7 +81,7 @@ class LatestPosts(Feed):
 	
 	def item_extra_kwargs(self, item):
 		comment_count = Comment.all().filter('content_object = ', item).count()		
-		return { 'key': item.pk, 'comments': str(comment_count) }
+		return { 'key': item.pk, 'comment_count': str(comment_count) }
 
 
 class LatestComments(LatestCommentFeed):
