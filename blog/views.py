@@ -6,7 +6,7 @@ from django.template import RequestContext
 from django.utils import simplejson
 from django.views.decorators.cache import cache_page, never_cache
 from django.views.generic import list_detail
-from blog.models import *
+from blog.models import Category, Post
 from datetime import datetime, timedelta
 import logging
 from memoize import memoize

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.utils import simplejson
-from blog.models import *
+from blog.models import Category, Post
 from comments.models import Comment
 from datetime import datetime
 import re

@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from google.appengine.ext import db
-from lifestream.models import *
+from lifestream.models import Tweet
 from datetime import datetime
 import feedparser
 import logging, re

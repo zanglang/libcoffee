@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.admin.widgets import AdminSplitDateTime
 
-from blog.models import *
+from blog.models import Post
 
 class PostForm(forms.ModelForm):
 	body = forms.CharField(widget=forms.Textarea(attrs={

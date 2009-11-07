@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib import admin
 from django.forms.models import inlineformset_factory
-from blog.models import *
+from blog.models import Category, Post
 from blog.forms import PostForm
 from comments.models import Comment
 
