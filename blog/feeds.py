@@ -1,6 +1,6 @@
-#from django.contrib.comments.models import Comment
 from django.contrib.sites.models import Site
 from django.contrib.syndication.feeds import Feed, FeedDoesNotExist
+from django.conf import settings
 from django.core.cache import cache as memcache
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
@@ -15,14 +15,21 @@ from keycache import serialize_models, deserialize_models
 class CustomFeed(Rss201rev2Feed):
 	"""Custom feed generator that implements generic feed extensions"""
 	
+	def rss_attributes(self):
+		attrs = super(CustomFeed, self).rss_attributes()
+		attrs.update({
+			'xmlns:wfw': 'http://wellformedweb.org/CommentAPI/',
+			'xmlns:geo': 'http://www.w3.org/2003/01/geo/wgs84_pos#',
+			'xmlns:trackback': 'http://madskills.com/public/xml/rss/module/trackback/',
+			'xmlns:slash': 'http://purl.org/rss/1.0/modules/slash/' })
+		return attrs
+		
 	def add_root_elements(self, handler):
 		super(CustomFeed, self).add_root_elements(handler)
 		handler.addQuickElement('generator', 'Libcoffee.net/Django')
-		handler.addQuickElement('webMaster', 'admin@libcoffee.net')
-		handler.addQuickElement('geo:lat', '3.106789',
-				{'xmlns:geo': 'http://www.w3.org/2003/01/geo/wgs84_pos#'})
-		handler.addQuickElement('geo:long', '101.592145',
-				{'xmlns:geo': 'http://www.w3.org/2003/01/geo/wgs84_pos#'})
+		handler.addQuickElement('webMaster', settings.ADMIN_EMAIL)
+		handler.addQuickElement('geo:lat', '3.106789')
+		handler.addQuickElement('geo:long', '101.592145')
 
 
 class CustomPostFeed(CustomFeed):
@@ -31,13 +38,13 @@ class CustomPostFeed(CustomFeed):
 	
 	def add_item_elements(self, handler, item):
 		super(CustomPostFeed, self).add_item_elements(handler, item)
+		# this part really shouldn't be hardcoded...
 		handler.addQuickElement('trackback:ping',
 				'http://%s%s' % (Site.objects.get_current().domain,
-				reverse('receive_trackback', kwargs={'object_id': item['key']})),
-				{'xmlns:trackback': 'http://madskills.com/public/xml/rss/module/trackback/'})
+				reverse('receive_trackback', kwargs={'object_id': item['key']})))
 		handler.addQuickElement('wfw:commentRss',
-				item['link'].replace('blog', 'blog/feeds/articles'),
-				{'xmlns:wfw': 'http://wellformedweb.org/CommentAPI/'})
+				item['link'].replace('blog', 'blog/feeds/articles'))
+		handler.addQuickElement('slash:comments', item['comments'])
 
 
 class LatestPosts(Feed):
@@ -74,7 +81,8 @@ class LatestPosts(Feed):
 		return item.created_at
 	
 	def item_extra_kwargs(self, item):
-		return { 'key': item.pk } 
+		comment_count = Comment.all().filter('content_object = ', item).count()		
+		return { 'key': item.pk, 'comments': str(comment_count) }
 
 
 class LatestComments(LatestCommentFeed):
