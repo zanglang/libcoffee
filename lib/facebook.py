@@ -1,7 +1,7 @@
+from django.utils import simplejson
 import md5
 import urllib
 import time
-import simplejson
 
 REST_SERVER = 'http://api.facebook.com/restserver.php'
 

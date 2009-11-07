@@ -5,8 +5,7 @@ from django.core.cache import cache as memcache
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.utils.feedgenerator import Rss201rev2Feed
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
+from datetime import datetime, timedelta
 from blog.models import Post, Category
 from comments.models import Comment
 from comments.feeds import LatestCommentFeed
@@ -106,7 +105,7 @@ class PostCommentFeed(Feed):
 			post = Post.objects_published() \
 					.filter('slug =', bits[3]) \
 					.filter('created_at >=', date) \
-					.filter('created_at <', date + relativedelta(days=+1)).get()
+					.filter('created_at <', date + timedelta(days=1)).get()
 			memcache.set('post-for-' + str(date), serialize_models(post))
 		return post
 	

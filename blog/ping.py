@@ -11,8 +11,7 @@ URL_RE = re.compile(r'\b((https?|ftp|file)://[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+
 
 def resolver(target_url):
 	from django.core.urlresolvers import get_resolver, NoReverseMatch, Resolver404
-	from datetime import datetime
-	from dateutil.relativedelta import relativedelta
+	from datetime import datetime, timedelta
 	try:
 		urlresolver = get_resolver(None)
 		site = Site.objects.get_current()
@@ -20,7 +19,7 @@ def resolver(target_url):
 		date = datetime(int(kwargs['year']), int(kwargs['month']), int(kwargs['day']))
 		return Post.objects_published().filter('slug =', kwargs['slug']) \
 				.filter('created_at >=', date) \
-				.filter('created_at <', date + relativedelta(days=+1)).get()
+				.filter('created_at <', date + timedelta(days=1)).get()
 	except (NoReverseMatch, Resolver404), e:
 		return None
 	except Exception:

@@ -1,9 +1,9 @@
-from datetime import datetime
-import re
-import simplejson
+from django.contrib.auth.models import User
+from django.utils import simplejson
 from blog.models import *
 from comments.models import Comment
-from django.contrib.auth.models import User
+from datetime import datetime
+import re
 
 time = lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
 if User.all().count() == 0:

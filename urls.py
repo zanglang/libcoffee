@@ -27,9 +27,6 @@ urlpatterns += auth_patterns + patterns('',
 	(r'^auth/', include('auth.urls')),
 	
 	(r'^lifestream/', include('lifestream.urls')),
-
-	#(r'^media/(?P<path>.*)$', 'django.views.static.serve',
-	#	{'document_root': '/home/zanglang/djangoblog/media', 'show_indexes': True}),
 		
 	(r'^sitemap.xml$', sitemap, {'sitemaps': {
 			'blog': sitemaps.BlogSitemap, 

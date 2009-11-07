@@ -3,19 +3,18 @@ from django.core import serializers
 from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.utils import simplejson
 from django.views.decorators.cache import cache_page, never_cache
 from django.views.generic import list_detail
 from blog.models import *
 from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
 import logging
-import simplejson
 from memoize import memoize
 from ragendja.dbutils import get_object_or_404
 
 
 POSTS_PER_PAGE = 5
-POST_CACHE_TIME = 1000000
+POST_CACHE_TIME = 60*60*24
 
 
 @memoize()
@@ -113,7 +112,8 @@ def category_detail(request, slug, page=0):
 				.order('-created_at'),
 		paginate_by = POSTS_PER_PAGE,
 		page = page,
-		template_name = 'blog/post_list.html')
+		template_name = 'blog/category_detail.html',
+		extra_context={'category': category})
 
 
 @never_cache
