@@ -11,3 +11,6 @@ lib/socialauth
 *.pyc
 *.sqlite
 test*.json*
+.project
+.pydevproject
+.settings

@@ -57,7 +57,7 @@ def google_login_complete(request):
 		user = GoogleUsers.get_current_user()
 		logging.debug('Google login successful for %s' % user.email())
 	except:
-		 return render_failure(request, 'Google User details couldn\'t be found.')
+		return render_failure(request, 'Google User details couldn\'t be found.')
 	# check if we have a local user that we may login as well
 	try:
 		mapping = UserMapping.all().filter('google_id =', user.user_id())[0]
@@ -69,11 +69,11 @@ def google_login_complete(request):
 		if request.user.is_authenticated():
 			mapping = UserMapping(user=request.user, google_id=user.user_id())
 			mapping.save()
-	
+
 	request.session['user_type'] = 'google'
 	request.session['user_name'] = user.nickname()
 	if '@' not in user.nickname(): # may not have full nick (eg dev server) 
-		request.session['user_url'] = 'http://www.google.com/profiles/%s' % user.nickname() 
+		request.session['user_url'] = 'http://www.google.com/profiles/%s' % user.nickname()
 	request.session['user_email'] = user.email() or (user.nickname() + '@gmail.com')
 	logging.debug('login complete. redirecting to %s' % request.GET.get('next', ''))
 	return HttpResponseRedirect(request.GET.get('next', ''))
@@ -104,7 +104,6 @@ def openid_login_begin(request, template_name='auth/openid_login.html',
 					redirect_field_name: redirect_to
 				}, context_instance=RequestContext(request))
 
-	error = None
 	consumer = make_consumer(request)
 	try:
 		openid_request = consumer.begin(openid_url)
@@ -157,14 +156,14 @@ def openid_login_complete(request, redirect_field_name=REDIRECT_FIELD_NAME):
 			request.session['user_type'] = 'openid'
 			request.session['user_name'] = username
 			request.session['user_url'] = openid_response.identity_url
-			request.session['user_email'] = sreg_response.get('email', '')			
+			request.session['user_email'] = sreg_response.get('email', '')
 		else:
 			return render_failure(request,
 					'This OpenID provider does not support Simple Registration')
-		
-			
+
+
 		return HttpResponseRedirect(sanitise_redirect_url(redirect_to))
-	
+
 	elif openid_response.status == FAILURE:
 		return render_failure(request, 'OpenID authentication failed: %s' %
 			openid_response.message)
@@ -177,16 +176,16 @@ def openid_login_complete(request, redirect_field_name=REDIRECT_FIELD_NAME):
 
 def facebook_login_complete(request):
 	from datetime import datetime
-	from facebook import get_user_info, get_facebook_signature 
+	from facebook import get_user_info, get_facebook_signature
 	API_KEY = settings.FACEBOOK_API_KEY
 	API_SECRET = settings.FACEBOOK_API_SECRET
 	# FB Connect will set a cookie with a key == FB App API Key if the user has been authenticated
 	if API_KEY in request.COOKIES:
-		signature_hash = get_facebook_signature(API_KEY, API_SECRET, request.COOKIES, True)				
+		signature_hash = get_facebook_signature(API_KEY, API_SECRET, request.COOKIES, True)
 		# The hash of the values in the cookie to make sure they're not forged
 		# AND If session hasn't expired
 		if(signature_hash == request.COOKIES[API_KEY]) and \
-				(datetime.fromtimestamp(float(request.COOKIES[API_KEY+'_expires'])) > datetime.now()):
+				(datetime.fromtimestamp(float(request.COOKIES[API_KEY + '_expires'])) > datetime.now()):
 			#Log the user in now.
 			session_key = request.COOKIES[API_KEY + '_session_key']
 			user_info_response = get_user_info(API_KEY, API_SECRET, request.COOKIES, session_key)
@@ -194,17 +193,17 @@ def facebook_login_complete(request):
 				logging.error('Facebook login failed')
 				logging.error(user_info_response)
 				return render_failure(request, 'Facebook login failed')
-			
+
 			logging.info('Facebook login successful')
 			logging.info(user_info_response)
 			request.session['user_type'] = 'facebook'
 			request.session['user_name'] = user_info_response[0]['name']
 			request.session['user_url'] = user_info_response[0]['website'] or \
-					'http://www.facebook.com/profile.php?id=%s' %  user_info_response[0]['uid']
+					'http://www.facebook.com/profile.php?id=%s' % user_info_response[0]['uid']
 			request.session['user_email'] = '%s@facebookuser.com' % user_info_response[0]['uid']
 		else:
 			logging.debug('Facebook cookies invalid')
 	else:
 		logging.debug('Facebook user not authenticated')
-			
+
 	return HttpResponseRedirect(request.GET.get('next', ''))

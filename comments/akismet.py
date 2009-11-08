@@ -55,7 +55,7 @@ Usage example::
 """
 
 
-import os, sys
+import os
 from urllib import urlencode
 
 import socket
@@ -92,7 +92,7 @@ if urllib2 is None:
         req = urlfetch.fetch(url=url, payload=data, method=urlfetch.POST, headers=headers)
         if req.status_code == 200:
             return req.content
-        raise Exception('Could not fetch Akismet URL: %s Response code: %s' % 
+        raise Exception('Could not fetch Akismet URL: %s Response code: %s' %
                         (url, req.status_code))
 else:
     def _fetch_url(url, data, headers):
@@ -128,8 +128,8 @@ class Akismet(object):
         This comprises of api key plus the baseurl.
         """
         return 'http://%s.%s' % (self.key, self.baseurl)
-    
-    
+
+
     def _safeRequest(self, url, data, headers):
         try:
             resp = _fetch_url(url, data, headers)

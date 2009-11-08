@@ -1,8 +1,6 @@
 from django.contrib.auth.models import User
-from django.db import models
 from django.db.models import permalink, signals
 from datetime import datetime
-import logging
 from google.appengine.api import memcache
 from google.appengine.ext import db
 from ragendja.dbutils import cleanup_relations, KeyListProperty
@@ -12,18 +10,18 @@ class Category(db.Model):
 	""" Blog Category """
 	title = db.CategoryProperty(required=True)
 	slug = db.StringProperty()
-	
+
 	class Meta:
 		verbose_name_plural = 'categories'
 		ordering = ('title',)
-	
+
 	def __unicode__(self):
 		return u'%s' % self.title
-		
+
 	@permalink
 	def get_absolute_url(self):
 		return ('blog.views.category_detail', (), {'slug': self.slug or self.title})
-	
+
 	def save(self, *args, **kwargs):
 		if not self.slug:
 			self.slug = self.title.lower()
@@ -33,14 +31,14 @@ class Category(db.Model):
 
 class Post(db.Model):
 	""" Blog Post """
-	
+
 	MarkupType = (
 		# add more if needed
 		'Markdown', # Markdown
 		'reStructuredText', # restructuredText
 		'Textile' #Textile
 	)
-	
+
 	slug = db.StringProperty(multiline=False)
 	title = db.StringProperty(multiline=False, required=True)
 	author = db.ReferenceProperty(User)
@@ -51,18 +49,18 @@ class Post(db.Model):
 	categories = KeyListProperty(Category)
 	markup = db.StringProperty(choices=MarkupType)
 	trackback_content_field_name = 'body'
-	
+
 	def __init__(self, *args, **kw):
 		super(Post, self).__init__(*args, **kw)
 		self._was_published = self.published
-	
+
 	def __unicode__(self):
 		return u'%s' % self.title
-		
+
 	class Meta:
 		ordering = ('-created_at',)
 		#get_latest_by = 'updated_at'
-		
+
 	def save(self, *args, **kwargs):
 		if not self.slug:
 			self.slug = self.title.replace(' ', '').lower()
@@ -70,7 +68,7 @@ class Post(db.Model):
 			self.created_at = datetime.now()
 		super(Post, self).save(*args, **kwargs)
 		memcache.flush_all()
-		
+
 	@permalink
 	def get_absolute_url(self):
 		return ('blog.views.post_detail', (), {
@@ -79,11 +77,11 @@ class Post(db.Model):
 			'month': self.created_at.strftime('%m').lower(),
 			'day': self.created_at.day
 		})
-		
+
 	@staticmethod
 	def objects_published():
 		return Post.all().filter('published =', True)
-	
+
 signals.pre_delete.connect(cleanup_relations, sender=Post)
 from blog.ping import send_trackback, send_ping, trackback_check
 from trackback.models import Trackback

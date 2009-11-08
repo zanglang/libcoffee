@@ -14,7 +14,7 @@ class LatestComments(template.Node):
 	def __init__(self, limit, var_name):
 		self.limit = limit
 		self.var_name = var_name
- 
+
 	def render(self, context):
 		comments = deserialize_models(memcache.get('blog-latest-comments'))
 		if comments is None:
@@ -26,7 +26,7 @@ class LatestComments(template.Node):
 		else:
 			context[self.var_name] = comments
 		return ''
- 
+
 @register.tag
 def get_latest_comments(parser, token):
 	try:
@@ -70,7 +70,7 @@ class CategoriesFor(template.Node):
 	def __init__(self, obj, varname):
 		self.varname = varname
 		self.obj_name = obj
-	
+
 	def render(self, context):
 		self.object = template.resolve_variable(self.obj_name, context)
 		categories = deserialize_models(memcache.get('categories-for-' + self.object.pk))
@@ -93,7 +93,7 @@ def get_categories_for(parser, token):
 class MonthList(template.Node):
 	def __init__(self, var_name):
 		self.var_name = var_name
-		
+
 	def render(self, context):
 		posts = Post.objects_published().order('-created_at')
 		dates = memcache.get('months-list')

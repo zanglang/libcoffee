@@ -6,7 +6,6 @@ from django.contrib.sites.models import Site
 from django_xmlrpc.decorators import xmlrpc_func, AuthenticationFailedException
 from blog.models import Category, Post
 from xmlrpclib import DateTime
-import logging
 
 # monkey patch -- http://bugs.cheetahtemplate.org/view.php?id=10
 import inspect
@@ -60,7 +59,7 @@ def category_struct(category):
 		'categoryId': category.pk,
 		'categoryName': unicode(category.title),
 		'isPrimary': False
-	} 
+	}
 
 def setTags(post, struct):
 	tags = struct.get('categories', None)
@@ -116,12 +115,12 @@ def metaWeblog_getRecentPosts(blogid, username, password, num_posts):
 def metaWeblog_newPost(blogid, username, password, struct, publish):
 	""" MetaWeblog API """
 	user = auth(username, password)
-	post = Post(title = struct['title'],
-				body = struct['description'],
-				author = user,
-				published = publish)
+	post = Post(title=struct['title'],
+				body=struct['description'],
+				author=user,
+				published=publish)
 	setTags(post, struct)
-	post.save()	
+	post.save()
 	return post.pk
 
 @xmlrpc_func(name='metaWeblog.editPost')
@@ -138,11 +137,11 @@ def metaWeblog_editPost(postid, username, password, struct, publish):
 	setTags(post, struct)
 	post.save()
 	return True
-	
+
 @xmlrpc_func(name='mt.setPostCategories')
 def mt_setPostCategories(postid, username, password, categories):
 	""" Movable Type API """
-	user = auth(username, password)
+	auth(username, password)
 	keys = [c['categoryId'] for c in categories]
 	post = Post.get(postid)
 	post.categories = Category.get(keys)
@@ -152,7 +151,7 @@ def mt_setPostCategories(postid, username, password, categories):
 @xmlrpc_func(name='mt.publishPost')
 def mt_publishPost(postid, username, password):
 	""" Movable Type API """
-	user = auth(username, password)
+	auth(username, password)
 	post = Post.get(postid)
 	post.published = True
 	post.save()
@@ -161,7 +160,7 @@ def mt_publishPost(postid, username, password):
 @xmlrpc_func(name='blogger.deletePost')
 def blogger_deletePost(appkey, postid, username, password, publish):
 	""" Blogger 1.0 API """
-	user = auth(username, password)
+	auth(username, password)
 	post = Post.get(postid)
 	post.delete()
 	return True

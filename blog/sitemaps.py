@@ -1,8 +1,6 @@
 from django.conf import settings
-from django.contrib.flatpages.models import FlatPage
 from django.contrib.sites.models import Site
 from django.contrib.sitemaps import Sitemap, ping_google
-from django.core.cache import cache as memcache
 from django.db.models.signals import post_save
 from blog.models import Post
 from memoize import memoize
@@ -16,10 +14,10 @@ def get_posts():
 class BlogSitemap(Sitemap):
 	changefreq = 'never'
 	priority = 0.5
-	
+
 	def items(self):
 		return get_posts()
-	
+
 	def lastmod(self, obj):
 		return obj.updated_at
 
@@ -38,7 +36,7 @@ def send_sitemap(sender, sitemap_url=None, **kwargs):
 	if not sitemap_url:
 		sitemap_url = 'http://%s' % Site.objects.get_current().domain
 	logging.debug('sending sitemap url %s' % sitemap_url)
-	
+
 	for (site, url) in URLS:
 		try:
 			ping_google(sitemap_url=sitemap_url, ping_url=url)

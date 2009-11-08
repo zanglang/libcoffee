@@ -1,5 +1,4 @@
 from django import template
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache as memcache
@@ -17,10 +16,10 @@ class TrackbackUrlNode(template.Node):
 	def render(self, context):
 		self.object = template.resolve_variable(self.obj_name, context)
 		return 'http://%s%s' % (Site.objects.get_current().domain, \
-							reverse('receive_trackback', kwargs = {
+							reverse('receive_trackback', kwargs={
 									'object_id': self.object.pk}))
 
-@register.tag		
+@register.tag
 def get_trackback_url(parser, token):
 	bits = token.contents.split()
 	if len(bits) != 2:
@@ -32,7 +31,7 @@ class TrackbacksNode(template.Node):
 	def __init__(self, obj, varname):
 		self.varname = varname
 		self.obj_name = obj
-	
+
 	def render(self, context):
 		self.object = template.resolve_variable(self.obj_name, context)
 		trackbacks = deserialize_models(memcache.get('trackback-for-' + self.object.pk))
@@ -40,7 +39,7 @@ class TrackbacksNode(template.Node):
 			trackbacks = Trackback.all() \
 					.filter('content_object =', self.object) \
 					.filter('is_public =', True)
-			memcache.set('trackback-for-' + self.object.pk, trackbacks)
+			memcache.set('trackback-for-' + self.object.pk, serialize_models(trackbacks))
 		context[self.varname] = trackbacks
 		return ''
 
@@ -52,12 +51,12 @@ def get_trackbacks_for(parser, token):
 	if bits[2] != 'as':
 		raise template.TemplateSyntaxError, "second argument to get_trackbacks tag must be 'as'"
 	return TrackbacksNode(bits[1], bits[3])
-   
-   
+
+
 class TrackbackRdfNode(template.Node):
 	def __init__(self, obj):
 		self.obj_name = obj
-				
+
 	def render(self, context):
 		self.object = template.resolve_variable(self.obj_name, context)
 		return cache_page(render_to_string('trackback/rdf_include.xml',
@@ -70,15 +69,15 @@ def get_trackback_rdf_for(parser, token):
 	if len(bits) != 2:
 		raise template.TemplateSyntaxError, "get_trackback_rdf_for tag takes exactly one argument"
 	return TrackbackRdfNode(bits[1])
-   
+
 
 class PingbackUrlNode(template.Node):
 	def __init__(self):
 		self.site = Site.objects.get_current()
-		
+
 	def render(self, context):
 		return u"http://%s%s" % (self.site.domain, reverse('receive_pingback'))
-		
+
 @register.tag
 def get_pingback_url(parser, token):
 	return PingbackUrlNode()

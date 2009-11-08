@@ -1,12 +1,9 @@
 from django import template
 from django.template.loader import render_to_string
 from django.conf import settings
-#from django.contrib.contenttypes.models import ContentType
-from django.contrib.sites.models import Site
 from django.core import urlresolvers
 from comments.models import Comment
 from comments.forms import CommentForm
-from django.utils.encoding import smart_unicode
 
 register = template.Library()
 
@@ -29,8 +26,8 @@ class BaseCommentNode(template.Node):
             if tokens[3] != 'as':
                 raise template.TemplateSyntaxError("Third argument in %r must be 'as'" % tokens[0])
             return cls(
-                object_expr = parser.compile_filter(tokens[2]),
-                as_varname = tokens[4],
+                object_expr=parser.compile_filter(tokens[2]),
+                as_varname=tokens[4],
             )
 
         # {% get_whatever for app.model pk as varname %}
@@ -71,11 +68,8 @@ class BaseCommentNode(template.Node):
         qs = self.comment_model.all() \
             .filter('content_object =', object) \
             .order('submit_date')
-			#.filter('site =', Site.objects.get_current())
-			#content_type = ctype,
-            #object_pk    = smart_unicode(object_pk),
-            #site__pk     = settings.SITE_ID,
-        
+            #.filter('site =', Site.objects.get_current())
+
         # The is_public and is_removed fields are implementation details of the
         # built-in comment model's spam filtering system, so they might not
         # be present on a custom comment model subclass. If they exist, we 

@@ -3,24 +3,22 @@ import datetime
 from django import forms
 from django.forms.util import ErrorDict
 from django.conf import settings
-#from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.utils.encoding import force_unicode
 from django.utils.hashcompat import sha_constructor
 from django.utils.text import get_text_list
 from django.utils.translation import ungettext, ugettext_lazy as _
 from comments.models import Comment
 import logging
 
-COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)
+COMMENT_MAX_LENGTH = getattr(settings, 'COMMENT_MAX_LENGTH', 3000)
 
 class CommentSecurityForm(forms.Form):
     """
     Handles the security aspects (anti-spoofing) for comment forms.
     """
-    content_type  = forms.CharField(widget=forms.HiddenInput)
-    object_pk     = forms.CharField(widget=forms.HiddenInput)
-    timestamp     = forms.IntegerField(widget=forms.HiddenInput)
+    content_type = forms.CharField(widget=forms.HiddenInput)
+    object_pk = forms.CharField(widget=forms.HiddenInput)
+    timestamp = forms.IntegerField(widget=forms.HiddenInput)
     security_hash = forms.CharField(min_length=40, max_length=40, widget=forms.HiddenInput)
 
     def __init__(self, target_object, data=None, initial=None):
@@ -29,7 +27,7 @@ class CommentSecurityForm(forms.Form):
             initial = {}
         initial.update(self.generate_security_data())
         super(CommentSecurityForm, self).__init__(data=data, initial=initial)
-        
+
     def security_errors(self):
         """Return just those errors associated with security"""
         errors = ErrorDict()
@@ -61,7 +59,7 @@ class CommentSecurityForm(forms.Form):
     def generate_security_data(self):
         """Generate a dict of security data for "initial" data."""
         timestamp = int(time.time())
-        security_dict =   {
+        security_dict = {
             'content_type'  : str(self.target_object._meta),
             'object_pk'     : str(self.target_object._get_pk_val()),
             'timestamp'     : str(timestamp),
@@ -91,13 +89,13 @@ class CommentDetailsForm(CommentSecurityForm):
     """
     Handles the specific details of the comment (name, comment, etc.).
     """
-    name          = forms.CharField(label=_("Name"), max_length=50,
+    name = forms.CharField(label=_("Name"), max_length=50,
 								widget=forms.TextInput(attrs={'class':'text'}))
-    email         = forms.EmailField(label=_("Email address"),
+    email = forms.EmailField(label=_("Email address"),
 								widget=forms.TextInput(attrs={'class':'text'}))
-    url           = forms.URLField(label=_("URL"), required=False,
+    url = forms.URLField(label=_("URL"), required=False,
 								widget=forms.TextInput(attrs={'class':'text'}))
-    comment       = forms.CharField(label=_('Comment'), widget=forms.Textarea,
+    comment = forms.CharField(label=_('Comment'), widget=forms.Textarea,
                                     max_length=COMMENT_MAX_LENGTH)
 
     def get_comment_object(self):
@@ -111,15 +109,15 @@ class CommentDetailsForm(CommentSecurityForm):
         """
         if not self.is_valid():
             raise ValueError("get_comment_object may only be called on valid forms")
-        
+
         CommentModel = self.get_comment_model()
         new = CommentModel(**self.get_comment_create_data())
         new = self.check_for_duplicate_comment(new)
         logging.debug(self.cleaned_data)
         logging.debug(new.user_type)
-        
+
         return new
-        
+
     def get_comment_model(self):
         """
         Get the comment model to create with this form. Subclasses in custom
@@ -127,7 +125,7 @@ class CommentDetailsForm(CommentSecurityForm):
         check_for_duplicate_comment to provide custom comment models.
         """
         return Comment
-        
+
     def get_comment_create_data(self):
         """
         Returns the dict of data to be used to create a comment. Subclasses in
@@ -137,19 +135,19 @@ class CommentDetailsForm(CommentSecurityForm):
         return dict(
             # content_type = ContentType.objects.get_for_model(self.target_object),
             # object_pk    = force_unicode(self.target_object._get_pk_val()),
-            content_object = self.target_object,
-            user_name    = self.cleaned_data["name"],
-            user_email   = self.cleaned_data["email"],
-            user_url     = self.cleaned_data["url"],
-            user_type    = self.data.get("user_type", ""),
-            comment      = self.cleaned_data["comment"],
-            submit_date  = datetime.datetime.now(),
+            content_object=self.target_object,
+            user_name=self.cleaned_data["name"],
+            user_email=self.cleaned_data["email"],
+            user_url=self.cleaned_data["url"],
+            user_type=self.data.get("user_type", ""),
+            comment=self.cleaned_data["comment"],
+            submit_date=datetime.datetime.now(),
             # site_id      = settings.SITE_ID,
-            site         = Site.objects.get_current(),
-            is_public    = True,
-            is_removed   = False,
+            site=Site.objects.get_current(),
+            is_public=True,
+            is_removed=False,
         )
-        
+
     def check_for_duplicate_comment(self, new):
         """
         Check that a submitted comment isn't a duplicate. This might be caused
@@ -171,7 +169,7 @@ class CommentDetailsForm(CommentSecurityForm):
         for old in possible_duplicates:
             if old.submit_date.date() == new.submit_date.date() and old.comment == new.comment:
                 return old
-                
+
         return new
 
     def clean_comment(self):
@@ -187,14 +185,14 @@ class CommentDetailsForm(CommentSecurityForm):
                 raise forms.ValidationError(ungettext(
                     "Watch your mouth! The word %s is not allowed here.",
                     "Watch your mouth! The words %s are not allowed here.", plural) % \
-                    get_text_list(['"%s%s%s"' % (i[0], '-'*(len(i)-2), i[-1]) for i in bad_words], 'and'))
+                    get_text_list(['"%s%s%s"' % (i[0], '-'*(len(i) - 2), i[-1]) for i in bad_words], 'and'))
         return comment
 
 class CommentForm(CommentDetailsForm):
     #honeypot      = forms.CharField(required=False,
     #                                label=_('If you enter anything in this field '\
     #                                        'your comment will be treated as spam'))
-    honeypot = forms.CharField(required = False, widget = forms.widgets.HiddenInput())
+    honeypot = forms.CharField(required=False, widget=forms.widgets.HiddenInput())
 
     def clean_honeypot(self):
         """Check that nothing's been entered into the honeypot."""

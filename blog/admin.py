@@ -1,6 +1,5 @@
 from django import forms
 from django.contrib import admin
-from django.forms.models import inlineformset_factory
 from blog.models import Category, Post
 from blog.forms import PostForm
 from comments.models import Comment
@@ -10,16 +9,16 @@ class CommentInline(admin.TabularInline):
 	model = Comment
 	fk_name = 'content_object'
 	extra = 0
-		
+
 	class CommentForm(forms.ModelForm):
 		comment = forms.CharField(label='Comment', widget=forms.Textarea(attrs={
-			'cols': '40', 'rows': '10', 'style': 'height:6em', 
+			'cols': '40', 'rows': '10', 'style': 'height:6em',
 			'class': 'vLargeTextField'}))
 		class Meta:
-			model= Comment
-			fields = ('content_object', 'comment', 'is_public', 'is_removed')			
+			model = Comment
+			fields = ('content_object', 'comment', 'is_public', 'is_removed')
 	form = CommentForm
-	
+
 
 class PostAdmin(admin.ModelAdmin):
 	form = PostForm
@@ -28,9 +27,9 @@ class PostAdmin(admin.ModelAdmin):
 	search_fields = ('title', 'body')
 	date_hierarchy = 'updated_at'
 	prepopulated_fields = {"slug": ("title",)}
-	inlines = [CommentInline,]
+	inlines = [CommentInline, ]
 	actions = ['publish']
-	
+
 	def publish(self, request, queryset):
 		from google.appengine.ext import db
 		for p in queryset:

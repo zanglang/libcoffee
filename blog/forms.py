@@ -1,11 +1,10 @@
 from django import forms
-from django.contrib.admin.widgets import AdminSplitDateTime
 
 from blog.models import Post
 
 class PostForm(forms.ModelForm):
 	body = forms.CharField(widget=forms.Textarea(attrs={
-			'cols': '40', 'rows': '10', 'style': 'height:400px', 
+			'cols': '40', 'rows': '10', 'style': 'height:400px',
 			'class': 'vLargeTextField'}))
 	class Meta:
 		model = Post

@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
 from blog.models import Post
 from blog.tasks import send_trackback as send_trackback_task
 from trackback import registry
@@ -20,7 +19,7 @@ def resolver(target_url):
 		return Post.objects_published().filter('slug =', kwargs['slug']) \
 				.filter('created_at >=', date) \
 				.filter('created_at <', date + timedelta(days=1)).get()
-	except (NoReverseMatch, Resolver404), e:
+	except (NoReverseMatch, Resolver404):
 		return None
 	except Exception:
 		logging.warn('Couldn\'t resolve url' % target_url, exc_info=True)
@@ -30,9 +29,7 @@ registry.add(resolver, True)
 
 def send_trackback(instance, **kwargs):
 	from trackback.utils.parse import discover_pingback_url, discover_trackback_url
-	from google.appengine.api.labs import taskqueue
-	import copy
-	
+
 	if settings.DEBUG: return # disable when debugging
 	if not settings.DEBUG and type(instance) is Post \
 		and (not instance.published or instance._was_published):
@@ -46,8 +43,7 @@ def send_trackback(instance, **kwargs):
 	data['blog_name'] = site.name
 	data['excerpt'] = content[:200]
 	payload = urllib.urlencode(data)
-	#send_trackback_url = reverse(send_trackback_task)
-	
+
 	countdown = 0
 	for url, _ in urls:
 		try:
@@ -67,7 +63,7 @@ def send_trackback(instance, **kwargs):
 			#		'target': target,
 			#		'source': data['url'],
 			#		'data': payload })
-			
+
 		except:
 			logging.error('send_trackback error', exc_info=True)
 
@@ -81,7 +77,7 @@ def send_ping(instance, **kwargs):
 	site = Site.objects.get_current()
 	domain = 'http://%s' % site.domain
 	instance_url = 'http://%s%s' % (site.domain, instance.get_absolute_url())
-	
+
 	URLS = (
 		('technorati', 'http://rpc.technorati.com/rpc/ping'),
 		('google', 'http://blogsearch.google.com/ping/RPC2'),
@@ -90,15 +86,15 @@ def send_ping(instance, **kwargs):
 	for (name, url) in URLS:
 		try:
 			rpc = xmlrpclib.Server(url);
-			result = rpc.weblogUpdates.ping(site.name, domain, instace_url)
+			result = rpc.weblogUpdates.ping(site.name, domain, instance_url)
 			if result['flerror']:
-				logging.warn('Error pinging %s (%s). Reason: %s' % 
+				logging.warn('Error pinging %s (%s). Reason: %s' %
 							(url, name, result['message']))
 			else:
 				logging.info('pinging %s (%s) successful' % (url, name))
 		except Exception:
 			logging.debug('Error sending XMLRPC', exc_info=True)
-	
+
 	data = urllib.urlencode({
 		'hub.url': 'http://%s/blog/feeds/latest/' % site.domain,
 		'hub.mode': 'publish'
@@ -110,12 +106,12 @@ def send_ping(instance, **kwargs):
 
 
 def trackback_check(instance, created, **kwargs):
-	from comments.akismet import Akismet	
+	from comments.akismet import Akismet
 	if not created: return
 	logging.debug('checking trackback for spam')
 	ak = Akismet(
-		key = settings.TYPEPAD_API_KEY,
-		blog_url = 'http://%s/' % Site.objects.get_current().domain
+		key=settings.TYPEPAD_API_KEY,
+		blog_url='http://%s/' % Site.objects.get_current().domain
 	)
 	ak.baseurl = 'api.antispam.typepad.com/1.1/'
 	if ak.verify_key():

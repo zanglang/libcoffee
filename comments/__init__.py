@@ -18,7 +18,7 @@ def get_form():
 	return CommentForm
 
 def get_form_target():
-    return urlresolvers.reverse("comments.post_comment")
+	return urlresolvers.reverse("comments.post_comment")
 
 
 def new_comment_notify(sender, comment, request, *args, **kwargs):
@@ -35,15 +35,15 @@ def new_comment_notify(sender, comment, request, *args, **kwargs):
 					body=message)
 	except:
 		logging.warning('Error sending notification', exc_info=True)
-		
-		
+
+
 
 def new_comment_check(sender, comment, request, *args, **kwargs):
 	if request.user.is_staff: return # don't bother to check
 	ak = Akismet(
 		#key = settings.AKISMET_API_KEY,
-		key = settings.TYPEPAD_API_KEY,
-		blog_url = 'http://%s/' % Site.objects.get_current().domain
+		key=settings.TYPEPAD_API_KEY,
+		blog_url='http://%s/' % Site.objects.get_current().domain
 	)
 	ak.baseurl = 'api.antispam.typepad.com/1.1/'
 	if ak.verify_key():
@@ -54,7 +54,7 @@ def new_comment_check(sender, comment, request, *args, **kwargs):
 			'comment_type': 'comment',
 			'comment_author': comment.user_name.encode('utf-8'),
 			'comment_author_url': comment.user_url.encode('utf-8'),
-			'comment_author_email': comment.user_email.encode('utf-8'),			
+			'comment_author_email': comment.user_email.encode('utf-8'),
 		}
 		if ak.comment_check(comment.comment.encode('utf-8'), data=data, build_data=True):
 			logging.info('marking comment as possibly spam')
