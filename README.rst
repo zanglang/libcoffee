@@ -30,7 +30,6 @@ Basic features:
 - Code block syntax highlighting
 - Trackbacks and pingbacks
 - Automated datastore backup via email
-- Movable Type/MetaWeblog API
 
 
 3. Installation
@@ -60,7 +59,7 @@ After that, it's the same as starting up Django's development server::
 - `python-openid <http://openidenabled.com/python-openid/>`_
 - `django-openid-auth <http://github.com/zanglang/django-openid-auth-appengine>`_
   (AppEngine port)
-- `django-xmlrpc <https://www.launchpad.net/django-xmlrpc>`_
+- `python-simplejson <http://www.undefined.org/python/>`_
 
 Some libraries are already checked in to Git...
 
