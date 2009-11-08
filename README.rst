@@ -29,7 +29,8 @@ Basic features:
 - Clean default template with Blueprint CSS, hAtom microformats
 - Code block syntax highlighting
 - Trackbacks and pingbacks
-- Automated datastore backup via email
+- Spam checking with Akismet
+- Scheduled datastore backup via email
 - Movable Type/MetaWeblog API
 
 
@@ -54,15 +55,12 @@ After that, it's the same as starting up Django's development server::
 - Django 1.1 (bundled with app-engine-patch)
 - Google App Engine SDK (latest, follow aep's setup instructions)
 - `pygments <http://pygments.org/>`_
-- `python-dateutil <http://labix.org/python-dateutil>`_
 - `python-docutils <http://docutils.sourceforge.net/>`_ (optional)
-- `python-markdown 2.0 <http://www.freewisdom.org/projects/python-markdown/>`_
+- `python-markdown 2.0 <http://www.freewisdom.org/projects/python-markdown/>`_ (optional)
 - `python-openid <http://openidenabled.com/python-openid/>`_
-- `django-openid-auth <http://github.com/zanglang/django-openid-auth-appengine>`_
-  (AppEngine port)
 - `django-xmlrpc <https://www.launchpad.net/django-xmlrpc>`_
 
-Some libraries are already checked in to Git...
+Some tiny libraries are already checked in to Git:
 
 - `BeautifulSoup <http://www.crummy.com/software/BeautifulSoup/>`_
 - Facebook Python API, from django-socialauth
@@ -72,6 +70,8 @@ Some libraries are already checked in to Git...
 Also included are a few Django apps ported to App Engine, and heavily modified:
 
 - django.contrib.comments
+- `django-openid-auth <http://github.com/zanglang/django-openid-auth-appengine>`_
+  (AppEngine port)
 - `django-trackback <http://code.google.com/p/django-trackback/>`_
 
 All libraries are expected to be in the ``lib/`` folder, or in a ZIP archive and
