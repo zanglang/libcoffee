@@ -30,6 +30,10 @@ handlers:
   static_files: static/LiveSearchSiteAuth.xml
   upload: static/LiveSearchSiteAuth.xml
 
+- url: /google83465fecfae4c3c3.html
+  static_files: static/google83465fecfae4c3c3.html
+  upload: static/google83465fecfae4c3c3.html
+
 - url: /_ereporter/.*
   script: $PYTHON_LIB/google/appengine/ext/ereporter/report_generator.py
   login: admin
