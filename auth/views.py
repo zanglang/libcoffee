@@ -1,4 +1,4 @@
-# django-openid-auth -  OpenID integration for django.contrib.auth
+# Code partially from django-openid-auth for use by Jerry Chong
 #
 # Copyright (C) 2007 Simon Willison
 # Copyright (C) 2008-2009 Canonical Ltd.
@@ -26,6 +26,7 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+#
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, \
@@ -39,7 +40,7 @@ from django_openid_auth.forms import OpenIDLoginForm
 from django_openid_auth.views import *
 from openid.consumer.consumer import SUCCESS, CANCEL, FAILURE
 from openid.consumer.discover import DiscoveryFailure
-from openid.extensions import sreg
+from openid.extensions import sreg, ax
 import logging
 import urllib
 from google.appengine.api import users as GoogleUsers
@@ -112,8 +113,14 @@ def openid_login_begin(request, template_name='auth/openid_login.html',
 			request, "OpenID discovery error: %s" % (str(exc),), status=500)
 
 	# Request some user details.
+	# ... with Simple Registration (sreg)
 	openid_request.addExtension(
-		sreg.SRegRequest(optional=['nickname', 'email', 'fullname']))
+			sreg.SRegRequest(optional=['email', 'fullname', 'nickname']))
+	# .. and Attribute Exchange (ax)
+	ax_req = ax.FetchRequest()
+	ax_req.add(ax.AttrInfo('http://axschema.org/namePerson', alias='fullname'))
+	ax_req.add(ax.AttrInfo('http://axschema.org/contact/email', alias='email'))
+	openid_request.addExtension(ax_req)
 
 	# Construct the request completion URL, including the page we
 	# should redirect to.
@@ -149,19 +156,26 @@ def openid_login_complete(request, redirect_field_name=REDIRECT_FIELD_NAME):
 #			return render_failure(request, 'Unknown user')
 #===============================================================================
 		sreg_response = sreg.SRegResponse.fromSuccessResponse(openid_response)
+		ax_response = ax.FetchResponse.fromSuccessResponse(openid_response)
 		if sreg_response:
-			username = sreg_response.get('fullname', '')
-			if username == '':
-				username = sreg_response.get('nickname', 'Some user')
-			request.session['user_type'] = 'openid'
-			request.session['user_name'] = username
-			request.session['user_url'] = openid_response.identity_url
-			request.session['user_email'] = sreg_response.get('email', '')
+			username = sreg_response.get('fullname') or \
+					sreg_response.get('nickname')
+			email = sreg_response.get('email')
+
+		elif ax_response:
+			username = ax_response.getSingle('http://axschema.org/namePerson')
+			_email = ax_response.get('http://axschema.org/contact/email')
+			email = len(_email) and _email[0] or None
+
 		else:
 			return render_failure(request,
-					'This OpenID provider does not support Simple Registration')
+					"""This OpenID provider does not support Simple Registration
+					or Attribute Exchange""")
 
-
+		request.session['user_type'] = 'openid'
+		request.session['user_name'] = username or 'Anonymous'
+		request.session['user_url'] = openid_response.identity_url
+		request.session['user_email'] = email or ''
 		return HttpResponseRedirect(sanitise_redirect_url(redirect_to))
 
 	elif openid_response.status == FAILURE:

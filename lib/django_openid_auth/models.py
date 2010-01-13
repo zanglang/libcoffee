@@ -28,12 +28,11 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from django.contrib.auth.models import User
-from django.db import models
 from google.appengine.ext import db
 
 
 class Nonce(db.Model):
-    server_url = db.URLProperty()
+    server_url = db.StringProperty()
     timestamp = db.IntegerProperty()
     salt = db.StringProperty()
 
