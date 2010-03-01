@@ -15,3 +15,7 @@ cron:
 - description: Download twitter
   url: /lifestream/tasks/update_twitter/
   schedule: every 10 minutes
+
+- description: Heartbeat
+  url: /
+  schedule: every 2 minutes
