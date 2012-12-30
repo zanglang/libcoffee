@@ -10,6 +10,9 @@ from flask import render_template
 from application import app
 from application import views
 
+from blog import app as blog_app
+app.register_blueprint(blog_app, url_prefix='/blog')
+
 
 ## URL dispatch rules
 # App Engine warm up handler
