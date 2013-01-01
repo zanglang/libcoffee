@@ -1,13 +1,11 @@
-
-# Standard ignores
+*.db
+*.json
 *.pyc
 *.pyo
-*.DS_Store
-*.swp
-*.idea
 *.project
 *.pydevproject
-*.kpf
-
-# Don't store secret keys in version control
+*~
+google
+lib/*
+lib/*.py
 secret_keys.py

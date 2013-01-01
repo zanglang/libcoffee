@@ -37,28 +37,29 @@ class DemoTestCase(unittest.TestCase):
 
     def test_home_redirects(self):
         rv = self.app.get('/')
-        assert rv.status == '302 FOUND'    
+        assert rv.status == '302 FOUND'
 
     def test_says_hello(self):
         rv = self.app.get('/hello/world')
         assert 'Hello world' in rv.data
 
     def test_displays_no_data(self):
+        self.setCurrentUser(u'john@example.com', u'123')
         rv = self.app.get('/examples')
         assert 'No examples yet' in rv.data
 
     def test_inserts_data(self):
         self.setCurrentUser(u'john@example.com', u'123')
-        rv = self.app.post('/example/new', data=dict(
+        rv = self.app.post('/examples', data=dict(
             example_name='An example',
             example_description='Description of an example'
         ), follow_redirects=True)
-        assert 'Example successfully saved' in rv.data
+        assert 'successfully saved' in rv.data
 
         rv = self.app.get('/examples')
         assert 'No examples yet' not in rv.data
         assert 'An example' in rv.data
-    
+
     def test_admin_login(self):
         #Anonymous
         rv = self.app.get('/admin_only')
@@ -66,7 +67,7 @@ class DemoTestCase(unittest.TestCase):
         #Normal user
         self.setCurrentUser(u'john@example.com', u'123')
         rv = self.app.get('/admin_only')
-        assert rv.status == '302 FOUND'
+        assert rv.status == '401 UNAUTHORIZED'
         #Admin
         self.setCurrentUser(u'john@example.com', u'123', True)
         rv = self.app.get('/admin_only')
@@ -77,6 +78,6 @@ class DemoTestCase(unittest.TestCase):
         assert rv.status == '404 NOT FOUND'
         assert '<h1>Not found</h1>' in rv.data
 
-    
+
 if __name__ == '__main__':
     unittest.main()

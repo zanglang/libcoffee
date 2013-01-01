@@ -1,13 +1,17 @@
-"""
-decorators.py
-
-Decorators for URL handlers
-
-"""
-
+from flask import abort, redirect, request, url_for
 from functools import wraps
 from google.appengine.api import users
-from flask import redirect, request, abort
+from werkzeug.routing import BuildError
+
+
+def permalink(function):
+    def inner(*args, **kwargs):
+        endpoint, values = function(*args, **kwargs)
+        try:
+            return url_for(endpoint, **values)
+        except BuildError:
+            return
+    return inner
 
 
 def login_required(func):

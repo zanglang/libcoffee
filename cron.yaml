@@ -1,0 +1,9 @@
+cron:
+- description: Regenerate sitemap.xml
+  url: /_gen_sitemap
+  schedule: every 24 hours
+  
+- description: Regenerate months list
+  url: /blog/_gen_months
+  schedule: every 24 hours
+  

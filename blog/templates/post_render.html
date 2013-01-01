@@ -1,0 +1,49 @@
+{% with permalink = post.absolute_url(True) %}
+
+<article class="hentry">
+	<header>
+		<h2 class="title">
+			<a class="entry-title bookmark" href="{{ permalink }}">
+				{{ post.title }}
+			</a>
+		</h2>
+		<div class="vcard">
+			Posted by
+			<cite class="author" title="{{ post.author.nickname() }}">
+				<span class="n nickname">Jerry</span>
+			</cite>
+			<abbr class="published" title="{{ post.created_at }}">
+				<span class="date">
+				{{ post.created_at|naturalday('%a, %b %d \'%y') }}
+				</span>
+			</abbr>
+		</div>
+	</header>
+	<div class="entry-content">
+		{{ post }}
+	</div>
+	<div class="meta">
+		<small>
+			<a rel="bookmark" href="{{ permalink }}">#</a>
+			Posted in
+			{% for category in post.categories %}
+				<a rel="tag" href="{{ category }}">
+					{{ category }}</a>
+			{% else %}
+				Uncategorized
+			{% endfor %}
+			<abbr class="published" title="{{ post.updated_at }}">
+				{{ post.created_at|timesince }}
+			</abbr>
+			<a href="{{ permalink }}#disqus_thread"
+				data-disqus-identifier="{{ post.absolute_url() }}">comments</a>
+			
+			<span class="pull-right">
+				<div class="g-plusone" data-size="small" data-annotation="none"
+					data-href="{{ post.absolute_url() }}">&nbsp;</div>
+			</span>
+		</small>
+	</div>
+</article>
+
+{% endwith %}

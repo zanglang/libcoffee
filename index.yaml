@@ -12,6 +12,25 @@ indexes:
 
 - kind: Post
   properties:
+  - name: __key__
+    direction: desc
+
+- kind: Post
+  properties:
+  - name: categories
   - name: published
+  - name: created_at
+    direction: desc
+
+- kind: Post
+  properties:
+  - name: published
+  - name: created_at
+    direction: desc
+
+- kind: Post
+  properties:
+  - name: published
+  - name: slug
   - name: created_at
     direction: desc

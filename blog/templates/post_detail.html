@@ -1,5 +1,22 @@
 {% extends "base.html" %}
 
+{% block title %}{{ post.title }} - Libcoffee.net{% endblock %}
+
 {% block content %}
-<h1>It works!</h1>
+{% include "post_render.html" %}
+
+<div id="comments">
+	<a name="comments"></a>
+	<h3>Comments</h3>
+	
+	<script type="text/javascript">
+	var disqus_identifier = '{{ post.absolute_url() }}',
+		disqus_url = '{{ post.absolute_url(True) }}';
+	</script>
+	<div id="disqus_thread">&nbsp;</div>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+<script src="//libcoffee.disqus.com/count.js" async="async"></script>
+
 {% endblock %}

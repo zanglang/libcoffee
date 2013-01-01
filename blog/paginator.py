@@ -1,3 +1,9 @@
+"""
+paginator.py
+
+By Armin Ronacher (http://flask.pocoo.org/snippets/44/)
+"""
+
 from math import ceil
 
 
@@ -32,3 +38,5 @@ class Paginator:
                     yield None
                 yield num
                 last = num
+
+    __iter__ = iter_pages
