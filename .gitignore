@@ -5,6 +5,7 @@
 *.project
 *.pydevproject
 *~
+.settings
 google
 lib/*
 lib/*.py
