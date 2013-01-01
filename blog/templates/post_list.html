@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Libcoffee.net{% endblock %}
+
+{% block content %}
+{% for post in posts %}
+
+{% include "post_render.html" %}
+
+{% else %}
+For some reason, there doesn't appear to be any posts.
+{% endfor %}
+
+{% macro paginate(paginator) %}
+	<div class="pagination">
+	<ul>
+	{% if paginator.has_prev %}
+		<li><a href="{{ request.path }}?page={{ paginator.page - 1 }}">&laquo;</a></li>
+	{% endif %}
+	{% for page in paginator %}
+		{% if page %}
+			{% if page != paginator.page %}
+				<li><a href="{{ request.path }}?page={{ page }}">{{ page }}</a></li>
+			{% else %}
+				<li class="active"><a href="{{ request.path }}?page={{ page }}">{{ page }}</a></li>
+			{% endif %}
+		{% else %}
+			<li><span class=ellipsis>&hellip;</span></li>
+		{% endif %}
+	{% endfor %}
+	{% if paginator.has_next %}
+		<li><a href="{{ request.path }}?page={{ paginator.page + 1 }}">&raquo;</a></li>
+	{% endif %}
+	</ul>
+	</div>
+{% endmacro %}
+{{ paginate(paginator) }}
+
+<script src="//libcoffee.disqus.com/count.js" async="async"></script>
+
+{% endblock %}

@@ -1,0 +1,15 @@
+eclipse.preferences.version=1
+encoding//blog/rst_directive.py=utf-8
+encoding//flask/app.py=utf-8
+encoding//flask/blueprints.py=utf-8
+encoding//flask/config.py=utf-8
+encoding//flask/globals.py=utf-8
+encoding//flask/helpers.py=utf-8
+encoding//flask/wrappers.py=utf-8
+encoding//tests/tests.py=utf-8
+encoding//werkzeug/contrib/atom.py=utf-8
+encoding//werkzeug/contrib/cache.py=utf-8
+encoding//werkzeug/datastructures.py=utf-8
+encoding//werkzeug/exceptions.py=utf-8
+encoding//werkzeug/routing.py=utf-8
+encoding//werkzeug/wrappers.py=utf-8

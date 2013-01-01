@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+{% set bootstrap_version = '2.2.1' %}
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+	<title>{% block title%}Generic Page{% endblock %}</title>
+	<link href="/static/bootstrap-{{ bootstrap_version }}.min.css" rel="stylesheet" type="text/css" />
+	<link href="/static/main.css" rel="stylesheet" type="text/css"  />
+	<link href="/static/pygments.css" rel="stylesheet" type="text/css"  />
+	<link rel="shortcut icon" href="/static/img/favicon.ico" />
+	<link rel="alternate" type="application/atom+xml" title="Atom" href="http://feeds.feedburner.com/libcoffee" />
+	<link rel="alternate" type="application/rss+xml" title="RSS for latest comments" href="http://libcoffee.disqus.com/latest.rss" />
+	<link rel="copyright" href="http://creativecommons.org/licenses/by-sa/3.0/" />
+	<meta name="y_key" content="df9eb06178cb5625"/>
+	<meta name="msvalidate.01" content="763C0CE3C4EA74446E443660DC925958" />
+	<meta name="google-site-verification" content="kAT-W3v85qi53YtLQ28eSsMc9tSt-AsfTuP9eoCpG_A" />
+	<link rel="openid.server" href="https://www.google.com/accounts/o8/ud" />
+	<link rel="openid.delegate" href="https://www.google.com/profiles/zanglang" />
+	<link rel="openid2.provider" href="https://www.google.com/accounts/o8/ud" />
+	<link rel="openid2.local_id" href="https://www.google.com/profiles/zanglang" />
+	{% block style_block %}<!-- page-specific CSS -->{% endblock %}
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>	
+	<script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+	<script type="text/javascript">
+	var disqus_developer = {{ config.DEBUG and 'true' or 'false' }},
+		disqus_shortname = 'libcoffee';
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-9779125-1'],
+			['_trackPageview']);
+	</script>
+	{% block head_script %}<!-- defer-incapable JS block -->{% endblock %}	
+</head>
+<body>
+	<div class="container-fluid">
+		
+		<!-- Page header -->
+		<div id="header" class="row-fluid">
+			<h1>
+				<a href="{{ url_for('blog.index') }}">
+				{% block pagetitle %}Libcoffee&#215;Blog{% endblock %}
+				</a>
+			</h1>
+			<hr/>
+		</div>
+		
+		<div class="row-fluid">
+			<!-- sidebar -->
+			<div id="sidebar" class="span3 pull-right">
+				{% include "sidebar.html" %}
+			</div>
+			
+			<!-- Page content -->
+			<div id="content" class="offset1 span7">
+				{% include 'flash_message.html' %}
+				{% block content %}
+					{{ lipsum() }}
+				{% endblock %}
+			</div>
+		</div>
+		
+		<!-- Footer -->
+		<footer>
+			<div id="footer" class="row-fluid">
+				<hr/>
+				<span class="copyright pull-left">
+					<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">
+					copyleft</a> &copy; 2012. some rights reserved.
+				</span>
+				<span class="pull-right">
+					powered by <a href="http://flask.pocoo.org/">flask</a> /
+					<a href="http://developers.google.com/appengine/">appengine</a> /
+					<a href="http://twitter.github.com/bootstrap/">bootstrap</a>
+				</span>
+			</div>
+		</footer>
+	</div>
+	
+	<script src="/static/bootstrap-{{ bootstrap_version }}.min.js"></script>
+	<script src="//apis.google.com/js/plusone.js" async="async"></script>
+	<script src="//libcoffee.disqus.com/embed.js" async="async"></script>
+	<script src="//libcoffee.disqus.com/embed.js" async="async"></script>
+	<script src="//www.google-analytics.com/ga.js" async="async"></script>
+	{% block tail_script %}<!-- defer-capable JS block -->{% endblock %}
+</body>
+</html>

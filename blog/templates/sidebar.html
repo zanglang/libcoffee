@@ -1,0 +1,21 @@
+<!-- Navigation sidebar -->
+{% block sidebar %}
+
+{% include 'profile.html' %}
+
+<h4>Categories</h4>
+<ul>
+	{% for category in categories %}
+		<li><a href="{{ url_for('blog.posts_by_category', category=category) }}">{{ category }}</a></li>
+	{% endfor %}
+</ul>
+
+<h4>Archives</h4>
+<ul>
+	{% for month in months %}
+		<li><a href="{{ url_for('blog.posts_by_date', year=month.year, month=month.month) }}">
+			{{ month|naturalday('%B %Y') }}</a></li>
+	{% endfor %}
+</ul>
+
+{% endblock %}
