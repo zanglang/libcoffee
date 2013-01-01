@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /auth/
-Disallow: /ping/
-Sitemap: http://www.libcoffee.net/sitemap.xml
