@@ -1,0 +1,3 @@
+[submodule "flask-appengine-template"]
+	path = flask-appengine-template
+	url = git://github.com/kamalgill/flask-appengine-template.git
