@@ -81,16 +81,7 @@ def posts_by_category(category):
 def post_detail(year, month, day, slug):
 	"""Page displaying one blog post"""
 
-	p = get_posts(year, month, day, slug)
-	try:
-		# somehow more than one post?
-		if type(p) is list:
-			p = p[0]
-		else:
-			p = p.get()
-	except:
-		logging.exception('Could not load post', exc_info=True)
-		abort(500)
+	p = get_posts(year, month, day, slug).get() or abort(404)
 	return render_template('post_detail.html', post=p)
 
 
