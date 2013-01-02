@@ -16,4 +16,5 @@ werkzeug_debugger_appengine
 wtforms
 lib/*
 lib/*.py
+pkg_resources.py
 secret_keys.py
