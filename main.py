@@ -5,6 +5,8 @@ Primary application
 import os, sys
 from flask import Flask, redirect, render_template, Response, url_for
 from flaskext.gae_mini_profiler import GAEMiniProfiler
+from google.appengine.ext import ereporter
+
 
 basepath = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(basepath, 'lib'))
@@ -14,6 +16,9 @@ app.config.from_object('settings')
 
 # Enable profiler (enabled in non-production environ only)
 GAEMiniProfiler(app)
+
+# Enable error reporter
+ereporter.register_logger()
 
 from blog import app as blog_app
 app.register_blueprint(blog_app, url_prefix='/blog')
@@ -28,10 +33,6 @@ register_flatpages(app)
 @app.route('/')
 def index():
 	return redirect(url_for('blog.index'))
-
-@app.route('/admin/')
-def admin():
-	return redirect('/_ah/admin/')
 
 @app.route('/_ah/warmup')
 def warmup():

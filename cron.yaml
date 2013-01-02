@@ -1,13 +1,18 @@
 cron:
 - description: Regenerate sitemap.xml
   url: /_gen_sitemap
-  schedule: every 24 hours
+  schedule: every day
   
 - description: Regenerate months list
   url: /blog/_gen_months
-  schedule: every 24 hours
+  schedule: every day
   
 - description: Daily Backup
   url: /_ah/datastore_admin/backup.create?name=datastore_backup&kind=Post&kind=Category&kind=Flatpage&filesystem=blobstore
-  schedule: every 24 hours
+  schedule: every day
   target: ah-builtin-python-bundle
+
+- description: Daily exception report
+  url: /_ereporter?sender=zanglang@gmail.com
+  schedule: every day
+  
