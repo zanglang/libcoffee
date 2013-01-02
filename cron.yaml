@@ -8,10 +8,6 @@ cron:
   url: /blog/tasks/maintenance/
   schedule: every 6 hours
 
-- description: Exception report
-  url: /_ereporter/?sender=zanglang@gmail.com
-  schedule: every 12 hours
-
 - description: Download twitter
   url: /lifestream/tasks/update_twitter/
   schedule: every 10 minutes

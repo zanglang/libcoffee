@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib import admin
+from django.contrib.admin.models import LogEntry
 from blog.models import Category, Post
 from blog.forms import PostForm
 from comments.models import Comment
@@ -30,12 +31,10 @@ class PostAdmin(admin.ModelAdmin):
 	inlines = [CommentInline, ]
 	actions = ['publish']
 
-	def publish(self, request, queryset):
-		from google.appengine.ext import db
-		for p in queryset:
-			p.published = True
-		db.put(queryset)
+	def publish(self, request, queryset): #@UnusedVariable
+		queryset.update(published=True)
 
 
 admin.site.register(Category)
 admin.site.register(Post, PostAdmin)
+admin.site.register(LogEntry)

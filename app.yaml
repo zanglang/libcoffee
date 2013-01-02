@@ -1,15 +1,38 @@
 application: libcoffeeblog
 version: 1
-runtime: python
+runtime: python27
 api_version: 1
+threadsafe: true
 
 default_expiration: '3650d'
 
+builtins:
+- admin_redirect: on
+- appstats: on
+- deferred: on
+- remote_api: on
+
+libraries:
+- name: django
+  version: latest
+
+inbound_services:
+- xmpp_message
+- mail
+- warmup
+
+
 handlers:
-- url: /remote_api
-  script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
-  secure: optional
+- url: /_ah/queue/deferred
+  script: djangoappengine.deferred.handler.application
   login: admin
+
+- url: /_ah/stats/.*
+  script: djangoappengine.appstats.application
+
+- url: /media/admin
+  static_dir: django/contrib/admin/media
+  expiration: '0'
 
 - url: /media
   static_dir: _generated_media
@@ -33,31 +56,14 @@ handlers:
 - url: /google83465fecfae4c3c3.html
   static_files: static/google83465fecfae4c3c3.html
   upload: static/google83465fecfae4c3c3.html
-
-- url: /_ereporter/.*
-  script: $PYTHON_LIB/google/appengine/ext/ereporter/report_generator.py
-  login: admin
-
-- url: /_ah/queue/deferred
-  script: $PYTHON_LIB/google/appengine/ext/deferred/__init__.py
-  login: admin
   
 - url: /.*?/tasks/.*
-  script: common/appenginepatch/main.py
-  login: admin
-
-- url: /zipme
-  script: lib/zipme.py
+  script: djangoappengine.main.application
   login: admin
 
 - url: /.*
-  script: common/appenginepatch/main.py
+  script: djangoappengine.main.application
   secure: optional
-
-
-inbound_services:
-- xmpp_message
-- mail
 
 
 skip_files:

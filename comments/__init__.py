@@ -7,7 +7,7 @@ from django.db.models.signals import post_save
 from akismet import Akismet
 from comments.forms import CommentForm
 from comments.models import Comment
-from comments.signals import comment_was_posted, comment_will_be_posted
+from comments.signals import comment_will_be_posted
 from google.appengine.api import mail, xmpp
 import logging
 
@@ -19,24 +19,6 @@ def get_form():
 
 def get_form_target():
 	return urlresolvers.reverse("comments.post_comment")
-
-
-def new_comment_notify(sender, comment, request, *args, **kwargs):
-	#if request.user.is_staff: return # don't bother to notify
-	logging.debug('sending mail for new comment')
-	message = '%s left a comment:\n\n%s' % (comment.user_name, comment.comment)
-	try:
-		status = xmpp.send_message(settings.ADMIN_EMAIL, message)
-		logging.debug('Sent XMPP message status: %s' % status)
-		if status != xmpp.NO_ERROR:
-			mail.send_mail(sender=settings.ADMIN_EMAIL,
-					to=settings.ADMIN_EMAIL,
-					subject='New comment on %s' % comment.content_object.title,
-					body=message)
-	except:
-		logging.warning('Error sending notification', exc_info=True)
-
-
 
 def new_comment_check(sender, comment, request, *args, **kwargs):
 	if request.user.is_staff: return # don't bother to check
@@ -59,9 +41,21 @@ def new_comment_check(sender, comment, request, *args, **kwargs):
 		if ak.comment_check(comment.comment.encode('utf-8'), data=data, build_data=True):
 			logging.info('marking comment as possibly spam')
 			comment.is_public = False
-		else:
-			logging.debug('comment is ham')
+			return
+		
+	# send XMPP notification
+	logging.debug('sending mail for new comment')
+	message = '%s left a comment:\n\n%s' % (comment.user_name, comment.comment)
+	try:
+		status = xmpp.send_message(settings.ADMIN_EMAIL, message)
+		logging.debug('Sent XMPP message status: %s' % status)
+		if status != xmpp.NO_ERROR:
+			mail.send_mail(sender=settings.ADMIN_EMAIL,
+					to=settings.ADMIN_EMAIL,
+					subject='New comment on %s' % comment.content_object.title,
+					body=message)
+	except:
+		logging.warning('Error sending notification', exc_info=True)
 
 
 comment_will_be_posted.connect(new_comment_check, dispatch_uid='comments-spam')
-comment_was_posted.connect(new_comment_notify, dispatch_uid='comments')

@@ -1,15 +1,13 @@
 from django.contrib.auth.models import User
+from django.core.cache import cache
+from django.db import models
 from django.db.models import permalink, signals
 from datetime import datetime
-from google.appengine.api import memcache
-from google.appengine.ext import db
-from ragendja.dbutils import cleanup_relations, KeyListProperty
 
-
-class Category(db.Model):
+class Category(models.Model):
 	""" Blog Category """
-	title = db.CategoryProperty(required=True)
-	slug = db.StringProperty()
+	title = models.CharField(required=True)
+	slug = models.CharField()
 
 	class Meta:
 		verbose_name_plural = 'categories'
@@ -20,16 +18,16 @@ class Category(db.Model):
 
 	@permalink
 	def get_absolute_url(self):
-		return ('blog.views.category_detail', (), {'slug': self.slug or self.title})
+		return ('category-detail', self.slug or self.title)
 
 	def save(self, *args, **kwargs):
 		if not self.slug:
 			self.slug = self.title.lower()
 		super(Category, self).save(*args, **kwargs)
-		memcache.flush_all()
+		cache.clear()
 
 
-class Post(db.Model):
+class Post(models.Model):
 	""" Blog Post """
 
 	MarkupType = (
@@ -39,15 +37,15 @@ class Post(db.Model):
 		'Textile' #Textile
 	)
 
-	slug = db.StringProperty(multiline=False)
-	title = db.StringProperty(multiline=False, required=True)
-	author = db.ReferenceProperty(User)
-	body = db.TextProperty(required=True)
-	created_at = db.DateTimeProperty(auto_now_add=True)
-	updated_at = db.DateTimeProperty(auto_now=True)
-	published = db.BooleanProperty(default=False)
-	categories = KeyListProperty(Category)
-	markup = db.StringProperty(choices=MarkupType)
+	slug = models.CharField(multiline=False)
+	title = models.CharField(multiline=False, required=True)
+	author = models.ForeignKey(User)
+	body = models.TextField(required=True)
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
+	published = models.BooleanField(default=False)
+	category = models.ForeignKey(Category)
+	markup = models.CharField(choices=MarkupType)
 	trackback_content_field_name = 'body'
 
 	def __init__(self, *args, **kw):
@@ -59,7 +57,6 @@ class Post(db.Model):
 
 	class Meta:
 		ordering = ('-created_at',)
-		#get_latest_by = 'updated_at'
 
 	def save(self, *args, **kwargs):
 		if not self.slug:
@@ -67,25 +64,16 @@ class Post(db.Model):
 		if not self.created_at: # not sure why it's empty
 			self.created_at = datetime.now()
 		super(Post, self).save(*args, **kwargs)
-		memcache.flush_all()
+		cache.clear()
 
 	@permalink
 	def get_absolute_url(self):
-		return ('blog.views.post_detail', (), {
-			'slug': self.slug,
-			'year': self.created_at.year,
-			'month': self.created_at.strftime('%m').lower(),
-			'day': self.created_at.day
-		})
+		return ('post-detail', (
+				self.created_at.year,
+				self.created_at.strftime('%m').lower(),
+				self.created_at.day,
+				self.slug))
 
 	@staticmethod
 	def objects_published():
-		return Post.all().filter('published =', True)
-
-signals.pre_delete.connect(cleanup_relations, sender=Post)
-from blog.ping import send_trackback, send_ping, trackback_check
-from trackback.models import Trackback
-import blog.metaweblog
-signals.post_save.connect(send_trackback, sender=Post, dispatch_uid='send-trackback')
-signals.post_save.connect(send_ping, sender=Post, dispatch_uid='send-ping')
-signals.post_save.connect(trackback_check, sender=Trackback, dispatch_uid='trackback-filter')
+		return Post.objects.filter('published =', True)

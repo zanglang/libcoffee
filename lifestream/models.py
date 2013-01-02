@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from google.appengine.ext import db
+from django.db import models
 
-
-class SocialEvent(db.Model):
-	guid = db.StringProperty(required=True)
-	timestamp = db.DateTimeProperty()
+class SocialEvent(models.Model):
+	guid = models.CharField(required=True)
+	timestamp = models.DateTimeField()
 
 	class Meta:
 		ordering = ('-timestamp',)
 
 class Tweet(SocialEvent):
-	tweet = db.TextProperty()
+	tweet = models.TextField()
 	text_property = 'tweet'
 
 	def __unicode__(self):
