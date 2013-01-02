@@ -27,7 +27,7 @@
 			<a rel="bookmark" href="{{ permalink }}">#</a>
 			Posted in
 			{% for category in post.categories %}
-				<a rel="tag" href="{{ category }}">
+				<a rel="tag" href="{{ url_for('blog.posts_by_category', category=category) }}">
 					{{ category }}</a>
 			{% else %}
 				Uncategorized
