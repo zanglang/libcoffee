@@ -7,15 +7,13 @@ App Engine datastore models
 
 import logging, re
 from flask import Blueprint, current_app, render_template, Response, url_for
-from google.appengine.api import taskqueue
+from google.appengine.api import memcache
 from google.appengine.ext import db
 from lxml import etree
 from unicodedata import normalize
-from werkzeug.contrib.cache import GAEMemcachedCache
 
 
 app = Blueprint('flatpages', __name__, template_folder='.')
-cache = GAEMemcachedCache()
 
 def slugify(text, delim=u'-'):
 	"""Generates an slightly worse ASCII-only slug."""
@@ -43,7 +41,7 @@ class Flatpage(db.Model):
 		return render_template('flatpage.html', flatpage=self)
 
 	def __html__(self):
-		markedup = cache.get('markup_' + str(self.key()))
+		markedup = memcache.get('markup_' + str(self.key()))
 		if not markedup:
 			# check markup library?
 			func = current_app.jinja_env.filters.get('markup')
@@ -51,7 +49,7 @@ class Flatpage(db.Model):
 				return self.content
 
 			markedup = func(self.content, 'Markdown')
-			cache.set('markup_' + str(self.key()), markedup)
+			memcache.set('markup_' + str(self.key()), markedup)
 
 		return markedup
 
@@ -69,31 +67,31 @@ def generate_sitemap():
 
 	root = etree.Element('urlset', { 'attr': 'http://www.sitemaps.org/schemas/sitemap/0.9' })
 
-	def add_url(location, last_modified=None, change_freq='never', priority=0.5):
+	def add_url(location, last_modified=None, change_freq='always', priority=0.5):
 		e = etree.SubElement(root, 'url')
 		etree.SubElement(e, 'loc').text = location
 		if last_modified:
-			etree.SubElement(e, 'lastmod').text = last_modified.isoformat()
+			etree.SubElement(e, 'lastmod').text = last_modified.strftime('%Y-%m-%dT%H:%M:%S+00:00')
 		etree.SubElement(e, 'changefreq').text = change_freq
 		etree.SubElement(e, 'priority').text = str(priority)
 
 	for p in Flatpage.all():
 		add_url(p.absolute_url(external=True))
 
-	cache.set('flatpages_sitemaps', etree.tostring(root, encoding='utf-8',
-			pretty_print=True, xml_declaration=True))
-	logging.info('Generated sitemap.xml with %d flatpages.', len(root))
-	return 'OK'
+	logging.info('Generated sitemap.xml with %d flatpages', len(root))
+	xml = etree.tostring(root, encoding='utf-8', pretty_print=True, xml_declaration=True)
+	memcache.set('flatpages_sitemaps', xml)
+	return xml
 
 
 @app.route('/sitemap.xml')
 def sitemap():
 	"""Returns a Sitemap.xml of all published flat pages"""
 
-	xml = cache.get('flatpages_sitemaps')
+	xml = memcache.get('flatpages_sitemaps')
 	if not xml:
-		taskqueue.add(url=url_for('flatpages.generate_sitemap'))
-		return Response('Regenerating sitemap.xml, please come back later.', status=307)
+		logging.warning('Regenerating sitemaps.xml...')
+		xml = generate_sitemap()
 
 	return Response(xml, mimetype='text/xml')
 
@@ -117,4 +115,4 @@ def register_flatpages(parentapp):
 
 	for page in Flatpage.all():
 		parentapp.add_url_rule(page.url, page.endpoint, view_func=page._render)
-		logging.info('Registered: ' + page.url)
+		logging.debug('Registered: ' + page.url)

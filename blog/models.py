@@ -6,10 +6,10 @@ models.py
 import re
 from datetime import datetime
 from decorators import permalink
+from google.appengine.api import memcache
 from google.appengine.ext import db
 from unicodedata import normalize
 
-from blog import cache
 from blog.markup import markup
 
 
@@ -43,7 +43,7 @@ class Category(db.Model):
 		return u'%s' % self.title
 
 	def save(self, *args, **kwargs):
-		cache.delete('categories-all-cached')
+		memcache.delete('categories-all-cached')
 		super(Category, self).save(*args, **kwargs)
 
 	@permalink
@@ -55,10 +55,10 @@ class Category(db.Model):
 
 	@staticmethod
 	def all_cached():
-		c = cache.get('categories-all-cached')
+		c = memcache.get('categories-all-cached')
 		if not c:
 			c = sorted(c.title for c in Category.all())
-			cache.set('categories-all-cached', c)
+			memcache.set('categories-all-cached', c)
 		return c
 
 
@@ -87,10 +87,10 @@ class Post(db.Model):
 		self._was_published = self.published
 
 	def __html__(self):
-		markedup = cache.get('markup_' + str(self.key()))
+		markedup = memcache.get('markup_' + str(self.key()))
 		if not markedup:
 			markedup = markup(self.body, self.markup)
-			cache.set('markup_' + str(self.key()), markedup)
+			memcache.set('markup_' + str(self.key()), markedup)
 
 		return markedup
 
@@ -106,7 +106,7 @@ class Post(db.Model):
 				Category(title=c).save()
 
 		# reset cached keys
-		cache.clear()
+		memcache.flush_all()
 		super(Post, self).save(*args, **kwargs)
 
 	@permalink

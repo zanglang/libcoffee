@@ -15,7 +15,8 @@ app = Flask('libcoffee')
 app.config.from_object('settings')
 
 # Enable profiler (enabled in non-production environ only)
-GAEMiniProfiler(app)
+if os.environ.get('SERVER_SOFTWARE', '').startswith('Dev'):
+	GAEMiniProfiler(app)
 
 # Enable error reporter
 ereporter.register_logger()

@@ -5,12 +5,12 @@ views.py
 import logging
 from datetime import datetime, timedelta
 from flask import abort, render_template, request, Response, url_for
-from google.appengine.api import taskqueue, users
+from google.appengine.api import memcache, users
 from google.appengine.ext import deferred
 from lxml import etree
 from werkzeug.contrib.atom import AtomFeed
 
-from blog import app, cache
+from blog import app
 from blog.models import Category, Post
 from blog.paginator import Paginator
 
@@ -31,7 +31,7 @@ def get_posts(year, month=None, day=None, slug=None):
 				.filter('created_at <', date + date2)
 
 
-def render_posts_paginated(posts):
+def render_posts_paginated(query):
 	"""Helper function to wrap a list of Posts with a Paginator"""
 
 	page = request.args.get('page')
@@ -42,20 +42,20 @@ def render_posts_paginated(posts):
 	else:
 		page = 1
 
-	p = posts[(page - 1) * POSTS_PER_PAGE : page * POSTS_PER_PAGE]
-	if not p and page != 1:
+	posts = query.run(offset=(page - 1) * POSTS_PER_PAGE, limit=POSTS_PER_PAGE)
+	if not posts and page != 1:
 		abort(404)
 
-	return render_template('post_list.html', posts=p,
-			paginator=Paginator(page, POSTS_PER_PAGE, posts.count()))
+	return render_template('post_list.html', posts=posts,
+			paginator=Paginator(page, POSTS_PER_PAGE, query.count()))
 
 
 @app.route('/')
 def index():
 	"""Main page"""
 
-	p = Post.objects_published().order('-created_at')
-	return render_posts_paginated(p)
+	q = Post.objects_published().order('-created_at')
+	return render_posts_paginated(q)
 
 
 @app.route('/<int:year>/', defaults={ 'month': None, 'day': None })
@@ -64,17 +64,17 @@ def index():
 def posts_by_date(year, month, day):
 	"""Page listing posts for a date range"""
 
-	p = get_posts(year, month, day)
-	return render_posts_paginated(p)
+	q = get_posts(year, month, day)
+	return render_posts_paginated(q)
 
 
 @app.route('/category/<category>/')
 def posts_by_category(category):
 	"""Page listing posts for a category"""
 
-	p = Post.objects_published().order('-created_at') \
+	q = Post.objects_published().order('-created_at') \
 			.filter('categories =', category)
-	return render_posts_paginated(p)
+	return render_posts_paginated(q)
 
 
 @app.route('/<int:year>/<int:month>/<int:day>/<slug>/')
@@ -89,12 +89,10 @@ def post_detail(year, month, day, slug):
 def generate_post_months():
 	"""Deferred task to generate a list of months for all blog posts"""
 
-	months = []
-	for p in Post.objects_published().order('-created_at'):
-		date = datetime(p.created_at.year, p.created_at.month, 1)
-		if not date in months:
-			months.append(date)
-	cache.set('list-post-months', months)
+	months = set()
+	for p in db.Query(Post, projection=('created_at')):
+		months.add(datetime(p.created_at.year, p.created_at.month, 1))
+	memcache.set('list-post-months', sorted(months))
 	return 'OK'
 
 
@@ -104,31 +102,37 @@ def generate_sitemap():
 
 	root = etree.Element('urlset', { 'attr': 'http://www.sitemaps.org/schemas/sitemap/0.9' })
 
-	def add_url(location, last_modified=None, change_freq='never', priority=0.5):
+	def add_url(location, last_modified=None, change_freq='always', priority=0.5):
 		e = etree.SubElement(root, 'url')
 		etree.SubElement(e, 'loc').text = location
 		if last_modified:
-			etree.SubElement(e, 'lastmod').text = last_modified.isoformat()
+			etree.SubElement(e, 'lastmod').text = last_modified.strftime('%Y-%m-%dT%H:%M:%S+00:00')
 		etree.SubElement(e, 'changefreq').text = change_freq
 		etree.SubElement(e, 'priority').text = str(priority)
 
 	for p in Post.objects_published().order('-created_at'):
 		add_url(p.absolute_url(external=True), p.updated_at)
 
-	cache.set('blog_sitemaps', etree.tostring(root, encoding='utf-8',
-			pretty_print=True, xml_declaration=True))
+	for c in Category.all():
+		add_url(c.absolute_url(external=True))
+
+	add_url(url_for('blog.index', _external=True), priority=1.0)
+	add_url(url_for('blog.latest_posts', _external=True))
+
 	logging.info('Generated sitemap.xml with %d blog posts', len(root))
-	return 'OK'
+	xml = etree.tostring(root, encoding='utf-8', pretty_print=True, xml_declaration=True)
+	memcache.set('blog_sitemaps', xml)
+	return xml
 
 
 @app.route('/sitemap.xml')
 def sitemap():
 	"""Returns a Sitemap.xml of all publised blog posts"""
 
-	xml = cache.get('blog_sitemaps')
+	xml = memcache.get('blog_sitemaps')
 	if not xml:
-		taskqueue.add(url=url_for('blog.generate_sitemap'))
-		return Response('Regenerating sitemap.xml, please come back later.', status=307)
+		logging.warning('Regenerating sitemaps.xml...')
+		xml = generate_sitemap()
 
 	return Response(xml, mimetype='text/xml')
 
@@ -154,9 +158,9 @@ def list_categories():
 
 @app.app_context_processor
 def list_post_months():
-	months = cache.get('list-post-months') or []
+	months = memcache.get('list-post-months') or []
 	if not months:
-		logging.info('Regenerating list of months by post...')
+		logging.warning('Regenerating list of months by post...')
 		deferred.defer(generate_post_months)
 	return { 'months': months }
 
