@@ -6,7 +6,7 @@ import logging
 from datetime import datetime, timedelta
 from flask import abort, render_template, request, Response, url_for
 from google.appengine.api import memcache, users
-from google.appengine.ext import deferred
+from google.appengine.ext import db, deferred
 from lxml import etree
 from werkzeug.contrib.atom import AtomFeed
 
@@ -90,7 +90,7 @@ def generate_post_months():
 	"""Deferred task to generate a list of months for all blog posts"""
 
 	months = set()
-	for p in db.Query(Post, projection=('created_at')):
+	for p in db.Query(Post, projection=('created_at',)):
 		months.add(datetime(p.created_at.year, p.created_at.month, 1))
 	memcache.set('list-post-months', sorted(months))
 	return 'OK'
