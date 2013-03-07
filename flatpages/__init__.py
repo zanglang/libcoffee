@@ -11,11 +11,10 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import db
 from lxml import etree
 from unicodedata import normalize
-from werkzeug.contrib.cache import GAEMemcachedCache
+from cache import cache
 
 
 app = Blueprint('flatpages', __name__, template_folder='.')
-cache = GAEMemcachedCache()
 
 def slugify(text, delim=u'-'):
 	"""Generates an slightly worse ASCII-only slug."""
@@ -86,6 +85,7 @@ def generate_sitemap():
 	return 'OK'
 
 
+@cache.cached
 @app.route('/sitemap.xml')
 def sitemap():
 	"""Returns a Sitemap.xml of all published flat pages"""

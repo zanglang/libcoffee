@@ -6,11 +6,12 @@ models.py
 import re
 from datetime import datetime
 from decorators import permalink
+from google.appengine.api import memcache as gae_cache
 from google.appengine.ext import db
 from unicodedata import normalize
 
-from blog import cache
 from blog.markup import markup
+from cache import cache
 
 
 def slugify(text, delim=u'-'):
@@ -67,9 +68,9 @@ class Post(db.Model):
 
 	MarkupType = (
 		# add more if needed
-		'Markdown',  # Markdown
-		'reStructuredText',  # restructuredText
-		'Textile'  # Textile
+		'Markdown',
+		'reStructuredText',
+		'Textile'
 	)
 
 	slug = db.StringProperty(multiline=False)
@@ -106,7 +107,7 @@ class Post(db.Model):
 				Category(title=c).save()
 
 		# reset cached keys
-		cache.clear()
+		gae_cache.Client().flush_all()
 		super(Post, self).save(*args, **kwargs)
 
 	@permalink

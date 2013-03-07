@@ -14,6 +14,10 @@ sys.path.insert(0, os.path.join(basepath, 'lib'))
 app = Flask('libcoffee')
 app.config.from_object('settings')
 
+# enable memcache
+from cache import cache
+cache.init_app(app)
+
 # Enable profiler (enabled in non-production environ only)
 GAEMiniProfiler(app)
 

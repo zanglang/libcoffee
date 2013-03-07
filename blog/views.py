@@ -10,9 +10,10 @@ from google.appengine.ext import deferred
 from lxml import etree
 from werkzeug.contrib.atom import AtomFeed
 
-from blog import app, cache
+from blog import app
 from blog.models import Category, Post
 from blog.paginator import Paginator
+from cache import cache
 
 POSTS_PER_PAGE = 5
 
@@ -50,6 +51,7 @@ def render_posts_paginated(posts):
 			paginator=Paginator(page, POSTS_PER_PAGE, posts.count()))
 
 
+@cache.cached
 @app.route('/')
 def index():
 	"""Main page"""
@@ -58,6 +60,7 @@ def index():
 	return render_posts_paginated(p)
 
 
+@cache.cached
 @app.route('/<int:year>/', defaults={ 'month': None, 'day': None })
 @app.route('/<int:year>/<int:month>/', defaults={ 'day': None })
 @app.route('/<int:year>/<int:month>/<int:day>/')
@@ -68,6 +71,7 @@ def posts_by_date(year, month, day):
 	return render_posts_paginated(p)
 
 
+@cache.cached
 @app.route('/category/<category>/')
 def posts_by_category(category):
 	"""Page listing posts for a category"""
@@ -77,6 +81,7 @@ def posts_by_category(category):
 	return render_posts_paginated(p)
 
 
+@cache.cached
 @app.route('/<int:year>/<int:month>/<int:day>/<slug>/')
 def post_detail(year, month, day, slug):
 	"""Page displaying one blog post"""
@@ -121,6 +126,7 @@ def generate_sitemap():
 	return 'OK'
 
 
+@cache.cached
 @app.route('/sitemap.xml')
 def sitemap():
 	"""Returns a Sitemap.xml of all publised blog posts"""
@@ -133,6 +139,7 @@ def sitemap():
 	return Response(xml, mimetype='text/xml')
 
 
+@cache.cached
 @app.route('/feeds/latest/')
 def latest_posts():
 	feed = AtomFeed('Libcoffee.net', feed_url=request.url, url=request.url_root)
@@ -157,7 +164,7 @@ def list_post_months():
 	months = cache.get('list-post-months') or []
 	if not months:
 		logging.info('Regenerating list of months by post...')
-		deferred.defer(generate_post_months)
+		taskqueue.add(url=url_for('blog.generate_post_months'))
 	return { 'months': months }
 
 @app.app_template_filter('timesince')

@@ -74,3 +74,4 @@ skip_files:
 - ^(.*/)?\..*
 - ^(.*/)?.*\.bak$
 - ^google$
+- ^flask-appengine-template$
