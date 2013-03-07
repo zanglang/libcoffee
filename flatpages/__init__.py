@@ -68,21 +68,21 @@ def generate_sitemap():
 
 	root = etree.Element('urlset', { 'attr': 'http://www.sitemaps.org/schemas/sitemap/0.9' })
 
-	def add_url(location, last_modified=None, change_freq='never', priority=0.5):
+	def add_url(location, last_modified=None, change_freq='always', priority=0.5):
 		e = etree.SubElement(root, 'url')
 		etree.SubElement(e, 'loc').text = location
 		if last_modified:
-			etree.SubElement(e, 'lastmod').text = last_modified.isoformat()
+			etree.SubElement(e, 'lastmod').text = last_modified.strftime('%Y-%m-%dT%H:%M:%S+00:00')
 		etree.SubElement(e, 'changefreq').text = change_freq
 		etree.SubElement(e, 'priority').text = str(priority)
 
 	for p in Flatpage.all():
 		add_url(p.absolute_url(external=True))
 
-	cache.set('flatpages_sitemaps', etree.tostring(root, encoding='utf-8',
-			pretty_print=True, xml_declaration=True))
 	logging.info('Generated sitemap.xml with %d flatpages.', len(root))
-	return 'OK'
+	xml = etree.tostring(root, encoding='utf-8', pretty_print=True, xml_declaration=True)
+	cache.set('flatpages_sitemaps', xml)
+	return xml
 
 
 @cache.cached
@@ -92,8 +92,8 @@ def sitemap():
 
 	xml = cache.get('flatpages_sitemaps')
 	if not xml:
-		taskqueue.add(url=url_for('flatpages.generate_sitemap'))
-		return Response('Regenerating sitemap.xml, please come back later.', status=307)
+		logging.warning('Regenerating sitemaps.xml...')
+		xml = generate_sitemap()
 
 	return Response(xml, mimetype='text/xml')
 
@@ -117,4 +117,4 @@ def register_flatpages(parentapp):
 
 	for page in Flatpage.all():
 		parentapp.add_url_rule(page.url, page.endpoint, view_func=page._render)
-		logging.info('Registered: ' + page.url)
+		logging.debug('Registered: ' + page.url)

@@ -19,7 +19,8 @@ from cache import cache
 cache.init_app(app)
 
 # Enable profiler (enabled in non-production environ only)
-GAEMiniProfiler(app)
+if os.environ.get('SERVER_SOFTWARE', '').startswith('Dev'):
+	GAEMiniProfiler(app)
 
 # Enable error reporter
 ereporter.register_logger()
